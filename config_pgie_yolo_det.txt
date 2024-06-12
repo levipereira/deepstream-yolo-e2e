@@ -2,14 +2,14 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=models/yolov9-c-converted-trt.onnx
-model-engine-file=models/yolov9-c-converted-trt.engine
+onnx-file=models/yolov8x-trt.onnx
+#model-engine-file=models/yolov9-c-converted-trt.engine
 labelfile-path=labels.txt
 batch-size=1
 infer-dims=3;640;640
 force-implicit-batch-dim=0
 # 0: FP32 1: INT8 2: FP16
-network-mode=2
+network-mode=0
 num-detected-classes=80
 interval=0
 gie-unique-id=1
