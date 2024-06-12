@@ -1,0 +1,3 @@
+[submodule "nvdsinfer_yolo"]
+	path = nvdsinfer_yolo
+	url = https://github.com/levipereira/nvdsinfer_yolo
