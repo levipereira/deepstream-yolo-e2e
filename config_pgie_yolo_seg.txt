@@ -2,8 +2,8 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=models/yolov8n-seg-trt.onnx
-model-engine-file=models/yolov8n-seg-trt.onnx_b1_gpu0_fp32.engine
+onnx-file=models/yolov9-c-seg-trt.onnx
+model-engine-file=models/yolov9-c-seg-trt-netsize-640-batch-1.engine
 labelfile-path=labels.txt
 batch-size=1
 force-implicit-batch-dim=0

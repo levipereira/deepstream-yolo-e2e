@@ -2,8 +2,8 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=models/yolov8n-trt.onnx
-model-engine-file=models/yolov9-c-converted-trt.engine
+onnx-file=models/yolov9-t-trt.onnx
+model-engine-file=models/yolov9-t-trt-netsize-640-batch-1.engine
 labelfile-path=labels.txt
 batch-size=1
 infer-dims=3;640;640
