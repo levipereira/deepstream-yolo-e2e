@@ -10,7 +10,7 @@ This repository provides an implementation of End-to-End YOLO models for DeepStr
 
 We support DeepStream versions 6.2, 6.3, 6.4, and 7.0 for dGPU/X86 and Jetson platforms. Currently, Jetson does not yet support Instance Segmentation models due to the deployment of the EfficientNMSX plugin, but we plan to release support for this soon.
 
-Additionally, this repository supports segmentation and detection models from the YOLO series, including YOLOv10, YOLOv9, YOLOv8, and YOLOv7. 
+This repository supports segmentation and detection models from the YOLO series - YOLOv10, YOLOv9, YOLOv8, and YOLOv7. 
 
 All YOLO series models are implemented with End2End Deep Learning, incorporating three key features:
 
@@ -36,10 +36,7 @@ Similarly, instance segmentation models from the YOLO series also maintain stand
 - `det_classes`: Specifies the class label assigned to each detected instance.
 - `det_masks`: Provides the segmentation masks corresponding to each detected instance.
 
-These standardized output layers ensure consistency across all YOLO models, facilitating easier integration and interpretation of results across different applications and frameworks.
-
-With all models standardized with output layers, we have streamlined processes in DeepStream using the nvdsinfer_yolo library, supporting the entire YOLO series without the need for additional modifications.
-
+With all models standardized with output layers ensure consistency across all YOLO models, we have streamlined processes in DeepStream using the `nvdsinfer_yolo` library for post-processing, supporting the entire YOLO series without the need for additional modifications.
 
 
 This project was developed using DeepStream SDK 7.0.<br>[DeepStream 7.0 is now supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
