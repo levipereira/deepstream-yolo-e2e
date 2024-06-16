@@ -6,23 +6,45 @@
 
 Implementation of End-to-End YOLO Models for DeepStream
 
+This repository provides an implementation of End-to-End YOLO models for DeepStream, optimizing the inference process by offloading Non-Maximum Suppression  computations onto the YOLO model itself. This design allows users to leverage dynamic batch sizes and input sizes seamlessly.
 
- This repository provides an implementation of End-to-End YOLO models for DeepStream, aiming to streamline the inference process by offloading Non-Maximum Suppression computations onto the YOLO model itself. This design allows users to leverage dynamic batch sizes and input sizes seamlessly.
+We support DeepStream versions 6.2, 6.3, 6.4, and 7.0 for dGPU/X86 and Jetson platforms. Currently, Jetson does not yet support Instance Segmentation models due to the deployment of the EfficientNMSX plugin, but we plan to release support for this soon.
 
-By eliminating the need for local NMS processing, users gain the flexibility to configure batch sizes and input sizes on-demand without compromising performance. All NMS computations remain integral to the YOLO model, optimizing resource utilization and simplifying model deployment.
+Additionally, this repository supports segmentation and detection models from the YOLO series, including YOLOv10, YOLOv9, YOLOv8, and YOLOv7. 
+
+All YOLO series models are implemented with End2End Deep Learning, incorporating three key features:
+
+1. **Dynamic Shapes** - TensorRT enables the creation of network resolutions different from the original exported ONNX.
+2. **Dynamic Batch Size** - Dynamically adjusts the batch size to maximize model performance according to the GPU's capabilities.
+3. **NMS-Free** - Achieved in two different ways:
+   1. **Native NMS-Free** - Models natively support NMS-Free, available for some YOLOv9 models and all YOLOv10 detection models.
+   2. **TensorRT Plugins** - Utilizes TensorRT EfficientNMS plugin for detection models, and EfficientNMSX and ROIAlign for segmentation models.
 
 
- 
+All detection models across the YOLO series adhere to standardized output layers:
+
+- `num_det`: Represents the number of detections.
+- `det_boxes`: Provides the bounding boxes coordinates for each detected object.
+- `det_scores`: Indicates the confidence score associated with each detected object.
+- `det_classes`: Specifies the class label or category assigned to each detected object.
+
+Similarly, instance segmentation models from the YOLO series also maintain standardized output layers:
+
+- `num_det`: Represents the count of detected instances.
+- `det_boxes`: Provides bounding box coordinates for each detected instance.
+- `det_scores`: Indicates the confidence score associated with each detected instance.
+- `det_classes`: Specifies the class label assigned to each detected instance.
+- `det_masks`: Provides the segmentation masks corresponding to each detected instance.
+
+These standardized output layers ensure consistency across all YOLO models, facilitating easier integration and interpretation of results across different applications and frameworks.
+
+With all models standardized with output layers, we have streamlined processes in DeepStream using the nvdsinfer_yolo library, supporting the entire YOLO series without the need for additional modifications.
+
 
 
 This project was developed using DeepStream SDK 7.0.<br>[DeepStream 7.0 is now supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
 
 
-This project combines the power of DeepStream 7, the latest and most advanced real-time video analytics platform, with the precision and efficiency of YOLOv9, the cutting-edge in object detection and instance segmentation. 
-
-With DeepStream 7, we unlock the full potential of real-time video processing, providing an unparalleled video analytics experience.
-
-YOLOv9 signifies a monumental leap forward in real-time object detection, introducing revolutionary methodologies like Programmable Gradient Information (PGI) and the Generalized Efficient Layer Aggregation Network (GELAN). This cutting-edge model showcases extraordinary enhancements in efficiency, accuracy, and adaptability, establishing unprecedented benchmarks on the MS COCO dataset.
 
 This repo support Object Detection and Instance Segmentation
 
