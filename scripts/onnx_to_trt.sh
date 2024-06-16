@@ -5,29 +5,23 @@ batch_size=1
 network_size=640
 precision="fp16"
 file=""
-update_config=false
-model_type=""
+config_file=""
 force=false
 
 # Function to display usage
 usage() {
-  echo "Usage: $0 -f file.onnx [-b batch_size] [-n network_size] [-p precision] [--update_config --det|--seg] [--force]"
+  echo "Usage: $0 -f file.onnx [-b batch_size] [-n network_size] [-p precision] [-c config_file] [--force]"
   echo "  -f: Name of the .onnx file to be processed"
   echo "  -b: Batch size (default: 1)"
   echo "  -n: Network size (default: 640)"
   echo "  -p: Precision (fp32, fp16, qat; default: fp16)"
-  echo "  --update_config: Update configuration file"
-  echo "  --det: Model is for detection (requires --update_config)"
-  echo "  --seg: Model is for segmentation (requires --update_config)"
+  echo "  -c: Configuration file to update"
   echo "  --force: Force re-generation of the engine file if it already exists"
   exit 1
 }
 
-# Get the directory where the script is located
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-
 # Parse command line options
-while getopts ":f:b:n:p:-:" opt; do
+while getopts ":f:b:n:p:c:-:" opt; do
   case ${opt} in
     f )
       file=$OPTARG
@@ -41,17 +35,11 @@ while getopts ":f:b:n:p:-:" opt; do
     p )
       precision=$OPTARG
       ;;
+    c )
+      config_file=$OPTARG
+      ;;
     - )
       case ${OPTARG} in
-        update_config)
-          update_config=true
-          ;;
-        det)
-          model_type="det"
-          ;;
-        seg)
-          model_type="seg"
-          ;;
         force)
           force=true
           ;;
@@ -79,12 +67,6 @@ if [ ! -f "$file" ]; then
   exit 1
 fi
 
-# Check if update_config flag is provided, model_type must also be specified
-if $update_config && [ -z "$model_type" ]; then
-  echo "Error: --det or --seg must be specified with --update_config."
-  usage
-fi
-
 # Set precision flags
 precision_flags=""
 case $precision in
@@ -103,12 +85,14 @@ case $precision in
     ;;
 esac
 
-# Extract filename without extension
+# Extract directory and filename without extension
+file_dir=$(dirname "$file")
 filename=$(basename "$file" .onnx)
-engine_filename="${filename}-netsize-${network_size}-batch-${batch_size}.engine"
-
+engine_filename="${filename}-${precision}-netsize-${network_size}-batch-${batch_size}.engine"
+engine_timing_filename="${filename}-${precision}-netsize-${network_size}.engine.timing.cache"
 # Check if the engine file already exists
-engine_filepath="${SCRIPT_DIR}/${engine_filename}"
+engine_timing_filepath="${file_dir}/${engine_timing_filename}"
+engine_filepath="${file_dir}/${engine_filename}"
 if [ -f "$engine_filepath" ] && ! $force; then
   echo "Warning: The engine file '$engine_filepath' already exists and will be reused. Use --force to rebuild."
 else
@@ -117,7 +101,7 @@ else
     --onnx=${file} \
     $precision_flags \
     --saveEngine=${engine_filepath} \
-    --timingCacheFile=${engine_filepath}.timing.cache \
+    --timingCacheFile=${engine_timing_filepath} \
     --warmUp=500 \
     --duration=10  \
     --useCudaGraph \
@@ -128,18 +112,12 @@ else
     --maxShapes=images:${batch_size}x3x${network_size}x${network_size}
 fi
 
-# Update configuration file if requested
-if $update_config; then
-  onnx_file_line="onnx-file=models/${filename}.onnx"
-  engine_file_line="model-engine-file=models/${engine_filename}"
-
-  if [ "$model_type" = "det" ]; then
-    config_file="${SCRIPT_DIR}/../config_pgie_yolo_det.txt"
-  elif [ "$model_type" = "seg" ]; then
-    config_file="${SCRIPT_DIR}/../config_pgie_yolo_seg.txt"
-  fi
-
+# Update configuration file if provided
+if [ -n "$config_file" ]; then
   if [ -f "$config_file" ]; then
+    onnx_file_line="onnx-file=${file}"
+    engine_file_line="model-engine-file=${engine_filepath}"
+    
     sed -i "s|^onnx-file=.*|$onnx_file_line|" "$config_file"
     sed -i "s|^model-engine-file=.*|$engine_file_line|" "$config_file"
     echo "Configuration file '$config_file' updated."
