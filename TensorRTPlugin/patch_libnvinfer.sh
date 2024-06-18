@@ -3,7 +3,7 @@
 # Detect architecture
 arch=$(uname -m)
 
-if [ "$arch" != "x86_64" ]; then
+if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
     echo "$arch not supported yet."
     exit 1
 fi
@@ -11,9 +11,18 @@ fi
 TRT_INSTALL_LIBPATH="/usr/lib/$arch-linux-gnu"
 
 # URLs for the different versions of the library
-URL_852="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.5.2.x86_64"
-URL_853="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.5.3.x86_64"
-URL_861="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.x86_64"
+declare -A URLs
+
+# x86_64 URLs
+URLs["libnvinfer_plugin.so.8.5.2.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.5.2.x86_64"
+URLs["libnvinfer_plugin.so.8.5.3.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.5.3.x86_64"
+URLs["libnvinfer_plugin.so.8.6.1.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.x86_64"
+URLs["libnvinfer_plugin.so.8.6.2.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.2.x86_64"
+
+# aarch64 URLs
+URLs["libnvinfer_plugin.so.8.6.1.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.aarch64"
+URLs["libnvinfer_plugin.so.8.6.2.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.2.aarch64"
+URLs["libnvinfer_plugin.so.10.0.1.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.10.0.1.aarch64"
 
 # Function to download and apply the patch
 download_and_patch() {
@@ -39,14 +48,16 @@ download_and_patch() {
     echo "$lib_name has been installed successfully."
 }
 
-# Check which version of the library is installed and apply the appropriate patch
-if [ -f "$TRT_INSTALL_LIBPATH/libnvinfer_plugin.so.8.5.2" ]; then
-    download_and_patch "libnvinfer_plugin.so.8.5.2" "$URL_852"
-elif [ -f "$TRT_INSTALL_LIBPATH/libnvinfer_plugin.so.8.5.3" ]; then
-    download_and_patch "libnvinfer_plugin.so.8.5.3" "$URL_853"
-elif [ -f "$TRT_INSTALL_LIBPATH/libnvinfer_plugin.so.8.6.1" ]; then
-    download_and_patch "libnvinfer_plugin.so.8.6.1" "$URL_861"
-else
+# Function to check and apply the appropriate patch
+check_and_patch() {
+    for lib in "${!URLs[@]}"; do
+        if [ -f "$TRT_INSTALL_LIBPATH/${lib%.*}" ]; then
+            download_and_patch "$lib" "${URLs[$lib]}"
+            return 0
+        fi
+    done
     echo "No compatible version of libnvinfer_plugin.so found in $TRT_INSTALL_LIBPATH."
     exit 1
-fi
+}
+
+check_and_patch
