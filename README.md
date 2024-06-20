@@ -190,9 +190,9 @@ deepstream-app -c deepstream_yolov9_mask.txt
 
 # How to Use Custom YOLO Models in This Project
 After training your model, you need to export the model to the ONNX format by implementing the final layers of the model using End2End. <br>
-The procedure is detailed in the [YOLO End2End](yolo_e2e)
+The procedure is detailed in the [YOLO End2End](https://github.com/levipereira/yolo_e2e/)
 
-Additionally, you must update the [`labels.txt`](labels.txt) file and modify the number of classes in the configuration file, either `deepstream_yolov9_det`.txt or `deepstream_yolov9_seg.txt`.
+Additionally, you must update the [`labels.txt`](labels.txt) file and modify the number of classes in the configuration file, either [`config_pgie_yolo_det.txt`](https://github.com/levipereira/deepstream-yolo-e2e/blob/c9f318b0182cc5d4591e15134ef7caf5a8cbddb9/config_pgie_yolo_det.txt#L13).txt or [`config_pgie_yolo_seg.txt`](https://github.com/levipereira/deepstream-yolo-e2e/blob/c9f318b0182cc5d4591e15134ef7caf5a8cbddb9/config_pgie_yolo_seg.txt#L13).
 
 
 ## Using EfficientNMSX Plugin for Segmentation Models
