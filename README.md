@@ -60,8 +60,8 @@ With all models standardized with output layers ensure consistency across all YO
 
 ### Support for QAT Models
 
-- **Yolov9-QAT** - ✅ **Ready**   
 - **Yolov10-QAT** - 🔧 **In Development**
+- **Yolov9-QAT** - ✅ **Ready**   
 - **Yolov8-QAT** - 🔧 **In Development**
 - **Yolov7-QAT** - ✅ **Ready**
 
