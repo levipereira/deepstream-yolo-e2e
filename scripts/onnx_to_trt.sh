@@ -15,7 +15,7 @@ usage() {
   echo "  -b: Batch size (default: 1)"
   echo "  -n: Network size (default: 640)"
   echo "  -p: Precision (fp32, fp16, qat; default: fp16)"
-  echo "  -c: Configuration file to update"
+  echo "  -c: Configuration PGIE file to update"
   echo "  --force: Force re-generation of the engine file if it already exists"
   exit 1
 }
@@ -105,8 +105,6 @@ else
     --warmUp=500 \
     --duration=10  \
     --useCudaGraph \
-    --useSpinWait \
-    --noDataTransfers \
     --minShapes=images:1x3x${network_size}x${network_size} \
     --optShapes=images:${batch_size}x3x${network_size}x${network_size} \
     --maxShapes=images:${batch_size}x3x${network_size}x${network_size}
@@ -117,9 +115,13 @@ if [ -n "$config_file" ]; then
   if [ -f "$config_file" ]; then
     onnx_file_line="onnx-file=${file}"
     engine_file_line="model-engine-file=${engine_filepath}"
+    batch_size_line="batch-size=${batch_size}"
+    infer_dims_line="infer-dims=3;${network_size};${network_size}"
     
     sed -i "s|^onnx-file=.*|$onnx_file_line|" "$config_file"
     sed -i "s|^model-engine-file=.*|$engine_file_line|" "$config_file"
+    sed -i "s|^batch-size=.*|$batch_size_line|" "$config_file"
+    sed -i "s|^infer-dims=.*|$infer_dims_line|" "$config_file"
     echo "Configuration file '$config_file' updated."
   else
     echo "Error: Configuration file '$config_file' does not exist."
