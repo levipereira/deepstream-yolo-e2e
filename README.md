@@ -56,6 +56,20 @@ This repository supports DeepStream versions 6.2, 6.3, 6.4, and 7.0 for both dGP
 
 With all models standardized with output layers ensure consistency across all YOLO models, we have streamlined processes in DeepStream using the [nvdsinfer_yolo](nvdsinfer_yolo) library for post-processing, supporting the entire YOLO series without the need for additional modifications.
 
+## Future Implementations 🚀
+
+### Support for QAT Models
+
+- **Yolov9-QAT** - ✅ **Ready**   
+- **Yolov10-QAT** - 🔧 **In Development**
+- **Yolov8-QAT** - 🔧 **In Development**
+- **Yolov7-QAT** - ✅ **Ready**
+
+**Ready**: Quantization Aware Training is implemented and ready for use, but integration into the current repository is still in progress. Stay tuned for updates!  
+**In Development**: Development is ongoing to add support for models with Quantization Aware Training. Stay tuned for updates!
+
+These future implementations aim to expand the range of models supported by this repository, offering enhanced capabilities for your projects.
+
 
 # Project Workflow 
 
