@@ -1,5 +1,5 @@
 
-# DeepStream / YOLO - Detection and Segmentation with End2End
+# DeepStream / YOLO - Detection and Segmentation with End2End Implementation
 
 
 Implementation of End-to-End YOLO Models for DeepStream
