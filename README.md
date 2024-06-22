@@ -1,8 +1,8 @@
 
-# DeepStream / YOLO - Detection and Segmentation with End2End Implementation
+# DeepStream / YOLO with End2End Implementation
 
 
-Implementation of End-to-End YOLO Models for DeepStream
+Implementation of End-to-End YOLO Detection and Segmentation Models for DeepStream
 
 This repository offers an optimized implementation of End-to-End YOLO models for DeepStream, enhancing inference efficiency by integrating Non-Maximum Suppression (NMS) directly into the YOLO models. This approach supports dynamic batch sizes and input sizes, providing seamless adaptability.
 
