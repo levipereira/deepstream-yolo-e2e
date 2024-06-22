@@ -54,7 +54,7 @@ This repository supports DeepStream versions 6.2, 6.3, 6.4, and 7.0 for both dGP
 - `det_masks` 
 
 
-With all models standardized with output layers ensure consistency across all YOLO models, we have streamlined processes in DeepStream using the [nvdsinfer_yolo](nvdsinfer_yolo) library for post-processing, supporting the entire YOLO series without the need for additional modifications.
+With all models standardized with output layers ensure consistency across all YOLO models, we have streamlined processes in DeepStream using the [nvdsinfer_yolo](https://github.com/levipereira/nvdsinfer_yolo/tree/master) library for post-processing, supporting the entire YOLO series without the need for additional modifications.
 
 ## Future Implementations 🚀
 
