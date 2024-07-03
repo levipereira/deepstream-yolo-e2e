@@ -5,6 +5,7 @@ services:
     runtime: nvidia
     environment:
       - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${XAUTHORITY}
       - CUDA_CACHE_DISABLE=0
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix

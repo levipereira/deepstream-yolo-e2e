@@ -27,3 +27,6 @@ RUN cd /apps/deepstream-yolo-e2e/; bash scripts/onnx_to_trt.sh -f models/yolov9-
 # Copy config files for running YOLOv9 on deepstream
 COPY ./labels.txt /apps/deepstream-yolo-e2e/labels.txt
 COPY ./deepstream_yolo_det.ini /apps/deepstream-yolo-e2e/deepstream_yolo_det.ini
+
+# Add /sbin/ to path so lsmod and modprobe can be found
+ENV PATH="/usr/sbin:/sbin:$PATH"
