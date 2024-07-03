@@ -15,14 +15,14 @@ COPY ./TensorRTPlugin /apps/deepstream-yolo-e2e/TensorRTPlugin
 COPY ./tracker /apps/deepstream-yolo-e2e/tracker
 COPY ./yolo_e2e /apps/deepstream-yolo-e2e/yolo_e2e
 
+# Copy config file for ONNX to TensorRT conversion
+COPY ./config_pgie_yolo_det.txt /apps/deepstream-yolo-e2e/config_pgie_yolo_det.txt
+
 # Build Parse Function for NVDSINFER_YOLO
 RUN cd /apps/deepstream-yolo-e2e/; bash scripts/compile_nvdsinfer_yolo.sh;
 
 # Patch TensorRT plugins for EfficientNMX
 RUN cd /apps/deepstream-yolo-e2e/; bash TensorRTPlugin/patch_libnvinfer.sh;
-
-# Copy config file for ONNX to TensorRT conversion
-COPY ./config_pgie_yolo_det.txt /apps/deepstream-yolo-e2e/config_pgie_yolo_det.txt
 
 # Run ONNX to TensorRT conversion script
 RUN cd /apps/deepstream-yolo-e2e/; bash scripts/onnx_to_trt.sh -f models/yolov9-c-trt.onnx -c config_pgie_yolo_det.txt
