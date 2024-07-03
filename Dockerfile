@@ -7,6 +7,9 @@ ENV PATH="/usr/sbin:/sbin:$PATH"
 # Install additional DeepStream plugins
 RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 
+# Install additional system utilities
+RUN apt-get update && apt-get install -y kmod
+
 # Copy local repository, 1 by 1 for efficient caching
 COPY ./models /apps/deepstream-yolo-e2e/models
 COPY ./nvdsinfer_yolo /apps/deepstream-yolo-e2e/nvdsinfer_yolo

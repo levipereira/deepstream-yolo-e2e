@@ -3,11 +3,20 @@ services:
     build: .
     image: local/deepstream-yolo-e2e:latest
     runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     environment:
-      - DISPLAY=:1
+      - DISPLAY=${DISPLAY}
       - XAUTHORITY=${HOME}/.Xauthority
       - CUDA_CACHE_DISABLE=0
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - /usr/lib/x86_64-linux-gnu/GL:/usr/lib/x86_64-linux-gnu/GL
     working_dir: /apps/deepstream-yolo-e2e
     command: ["deepstream-app", "-c", "deepstream_yolo_det.ini"]
