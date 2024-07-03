@@ -11,10 +11,18 @@ RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 RUN apt-get update && apt-get install -y \
     python3-pip \
     kmod \
+    python3-gi \
+    python3-dev \
+    python3-gst-1.0 \
+    python3-opencv \
+    python3-numpy \
+    libgstrtspserver-1.0-0 gstreamer1.0-rtsp \
+    libgirepository1.0-dev \
+    gobject-introspection gir1.2-gst-rtsp-server-1.0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install DeepStream Python bindings
-RUN pip3 install pyds gi
+RUN pip3 install pyds cuda-python
 
 # Copy local repository, 1 by 1 for efficient caching
 COPY ./models /apps/deepstream-yolo-e2e/models
