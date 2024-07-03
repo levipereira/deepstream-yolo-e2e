@@ -1,6 +1,9 @@
 # Base image from NVIDIA NGC (DeepStream container with Triton support)
 FROM nvcr.io/nvidia/deepstream:7.0-triton-multiarch
 
+# Copy local repository
+COPY . /apps/deepstream-yolo-e2e/
+
 # Install additional DeepStream plugins
 RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 
