@@ -1,14 +1,9 @@
 import sys
 import os
 import gi
-
 gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
 import pyds
-
-# Custom imports for platform-specific configurations and bus handling
-from common.platform_info import PlatformInfo
-from common.bus_call import bus_call
 
 # Constants for class IDs used in nvinfer
 PGIE_CLASS_ID_VEHICLE = 0
@@ -17,6 +12,22 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 MUXER_BATCH_TIMEOUT_USEC = 33000
 
+def bus_call(bus, message, loop):
+    msg_type = message.type
+    if msg_type == Gst.MessageType.EOS:
+        print("End-of-stream")
+        loop.quit()
+    elif msg_type == Gst.MessageType.ERROR:
+        err, debug = message.parse_error()
+        print(f"Error {err}: {debug}")
+        loop.quit()
+    return True
+
+def is_platform_aarch64():
+    return os.uname().machine == 'aarch64'
+
+def is_integrated_gpu():
+    return is_platform_aarch64()
 
 def osd_sink_pad_buffer_probe(pad, info, u_data):
     # Processing metadata for further use or visualization
@@ -60,7 +71,6 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
 
     return Gst.PadProbeReturn.OK
 
-
 def create_pipeline(input_file):
     # Initialize GStreamer
     Gst.init(None)
@@ -93,8 +103,7 @@ def create_pipeline(input_file):
         elements[name] = element
 
     # Platform-specific sink creation
-    platform_info = PlatformInfo()
-    if platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64():
+    if is_integrated_gpu() or is_platform_aarch64():
         elements["sink"] = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
     else:
         elements["sink"] = Gst.ElementFactory.make("nveglglessink", "nv-video-renderer")
@@ -138,7 +147,6 @@ def create_pipeline(input_file):
 
     return pipeline
 
-
 def run_pipeline(input_file):
     pipeline = create_pipeline(input_file)
 
@@ -152,7 +160,7 @@ def run_pipeline(input_file):
     bus.connect("message", bus_call, loop)
 
     # Add probe to get metadata
-    nvosd = pipeline.get_by_name("nvosd")
+    nvosd = pipeline.get_by_name("onscreendisplay")
     osdsinkpad = nvosd.get_static_pad("sink")
     if not osdsinkpad:
         sys.stderr.write("Unable to get sink pad of nvosd\n")
@@ -170,7 +178,6 @@ def run_pipeline(input_file):
 
     # Clean up
     pipeline.set_state(Gst.State.NULL)
-
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
