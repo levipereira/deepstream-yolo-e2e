@@ -8,13 +8,10 @@ WORKDIR /apps/deepstream-yolo-e2e
 RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 
 # Build Parse Function for NVDSINFER_YOLO
-RUN bash scripts/compile_nvdsinfer_yolo.sh
+RUN bash /apps/deepstream-yolo-e2e/scripts/compile_nvdsinfer_yolo.sh
 
 # Optional: Patch TensorRT plugins for EfficientNMX (for segmentation models)
-RUN bash TensorRTPlugin/patch_libnvinfer.sh
-
-# Download YOLO models
-RUN cd models && ./download_models.py
+RUN bash /apps/deepstream-yolo-e2e/TensorRTPlugin/patch_libnvinfer.sh
 
 # Run ONNX to TensorRT conversion script
 RUN bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.txt
