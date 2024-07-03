@@ -9,4 +9,4 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
     working_dir: /apps/deepstream-yolo-e2e
-    command: ["deepstream-app", "-c", "deepstream_yolo_det.txt"]
+    command: ["deepstream-app", "-c", "deepstream_yolo_det.ini"]
