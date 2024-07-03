@@ -7,8 +7,14 @@ ENV PATH="/usr/sbin:/sbin:$PATH"
 # Install additional DeepStream plugins
 RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 
-# Install additional system utilities
-RUN apt-get update && apt-get install -y kmod
+# Install additional system utilities and Python packages
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    kmod \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install DeepStream Python bindings
+RUN pip3 install pyds gi
 
 # Copy local repository, 1 by 1 for efficient caching
 COPY ./models /apps/deepstream-yolo-e2e/models
