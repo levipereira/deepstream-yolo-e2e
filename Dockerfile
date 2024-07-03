@@ -50,3 +50,4 @@ COPY ./deepstream_yolo_det.ini /apps/deepstream-yolo-e2e/deepstream_yolo_det.ini
 
 # Copy pipeline Python code
 COPY ./pipeline.py /apps/deepstream-yolo-e2e/pipeline.py
+COPY ./pipeline.py /apps/deepstream-yolo-e2e/pipeline_test.py
