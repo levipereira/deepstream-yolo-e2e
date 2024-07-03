@@ -16,7 +16,7 @@ services:
       - CUDA_CACHE_DISABLE=0
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
       - /usr/lib/x86_64-linux-gnu/GL:/usr/lib/x86_64-linux-gnu/GL
     working_dir: /apps/deepstream-yolo-e2e
-    command: ["deepstream-app", "-c", "deepstream_yolo_det.ini"]
+    command: ["python3", "pipeline.py", "/opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4"]
