@@ -1,9 +1,6 @@
 # Base image from NVIDIA NGC (DeepStream container with Triton support)
 FROM nvcr.io/nvidia/deepstream:7.0-triton-multiarch
 
-# Set working directory
-WORKDIR /apps/deepstream-yolo-e2e
-
 # Install additional DeepStream plugins
 RUN bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 
@@ -14,4 +11,4 @@ RUN bash /apps/deepstream-yolo-e2e/scripts/compile_nvdsinfer_yolo.sh
 RUN bash /apps/deepstream-yolo-e2e/TensorRTPlugin/patch_libnvinfer.sh
 
 # Run ONNX to TensorRT conversion script
-RUN bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.txt
+RUN bash /apps/deepstream-yolo-e2e/scripts/onnx_to_trt.sh -f /apps/deepstream-yolo-e2e/models/yolov9-c-trt.onnx -c /apps/deepstream-yolo-e2e/config_pgie_yolo_det.txt

@@ -8,6 +8,6 @@ services:
       - CUDA_CACHE_DISABLE=0
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - .:/apps/deepstream-yolo-e2e  # Mount local repo
+      - ./:/apps/deepstream-yolo-e2e/  # Mount local repo
     working_dir: /apps/deepstream-yolo-e2e
     command: ["deepstream-app", "-c", "deepstream_yolo_det.txt"]
