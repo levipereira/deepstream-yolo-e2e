@@ -12,6 +12,7 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 MUXER_BATCH_TIMEOUT_USEC = 33000
 
+# Function to handle messages on the bus
 def bus_call(bus, message, loop):
     msg_type = message.type
     if msg_type == Gst.MessageType.EOS:
@@ -23,22 +24,20 @@ def bus_call(bus, message, loop):
         loop.quit()
     return True
 
+# Function for probe to extract metadata
 def osd_sink_pad_buffer_probe(pad, info, u_data):
-    # Processing metadata for further use or visualization
     frame_number = 0
     num_rects = 0
 
     gst_buffer = info.get_buffer()
     if not gst_buffer:
-        print("Unable to get GstBuffer ")
-        return
+        print("Unable to get GstBuffer")
+        return Gst.PadProbeReturn.OK
 
-    # Retrieve batch metadata from the gst buffer
     batch_meta = pyds.gst_buffer_get_nvds_batch_meta(hash(gst_buffer))
     l_frame = batch_meta.frame_meta_list
     while l_frame is not None:
         try:
-            # Note that l_frame.data needs a cast to pyds.NvDsFrameMeta
             frame_meta = pyds.NvDsFrameMeta.cast(l_frame.data)
         except StopIteration:
             break
@@ -46,12 +45,11 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
         l_obj = frame_meta.obj_meta_list
         while l_obj is not None:
             try:
-                # Note that l_obj.data needs a cast to pyds.NvDsObjectMeta
                 obj_meta = pyds.NvDsObjectMeta.cast(l_obj.data)
             except StopIteration:
                 break
 
-            # Analytics of detected objects can be done here
+            # Here you can process metadata as needed
 
             try:
                 l_obj = l_obj.next
@@ -65,19 +63,15 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
 
     return Gst.PadProbeReturn.OK
 
+# Function to create the pipeline
 def create_pipeline(input_file, output_file):
-    # Initialize GStreamer
     Gst.init(None)
 
-    # Create pipeline element
-    print("Creating Pipeline \n")
     pipeline = Gst.Pipeline()
-
     if not pipeline:
         sys.stderr.write("Unable to create Pipeline\n")
         return None
 
-    # Create elements for the pipeline
     elements = {
         "source": ("filesrc", "file-source"),
         "h264parser": ("h264parse", "h264-parser"),
@@ -94,7 +88,6 @@ def create_pipeline(input_file, output_file):
         "sink": ("filesink", "file-sink")
     }
 
-    # Instance and check elements
     for name, val in elements.items():
         element = Gst.ElementFactory.make(val[0], val[1])
         if not element:
@@ -102,9 +95,9 @@ def create_pipeline(input_file, output_file):
             return None
         elements[name] = element
 
-    # Set properties
     elements["source"].set_property('location', input_file)
     elements["sink"].set_property('location', output_file)
+    elements["sink"].set_property('sync', 1)
     elements["encoder"].set_property('bitrate', 2000000)
     elements["cap_filter"].set_property('caps', Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
 
@@ -115,11 +108,9 @@ def create_pipeline(input_file, output_file):
     elements["streammux"].set_property('batch-size', 1)
     elements["pgie"].set_property('config-file-path', "config_pgie_yolo_det.txt")
 
-    # Add elements to pipeline
     for element in elements.values():
         pipeline.add(element)
 
-    # Link elements together
     elements["source"].link(elements["h264parser"])
     elements["h264parser"].link(elements["decoder"])
 
@@ -146,9 +137,9 @@ def create_pipeline(input_file, output_file):
 
     return pipeline
 
+# Function to run the pipeline
 def run_pipeline(input_file, output_file):
     pipeline = create_pipeline(input_file, output_file)
-
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
         return
@@ -158,7 +149,6 @@ def run_pipeline(input_file, output_file):
     bus.add_signal_watch()
     bus.connect("message", bus_call, loop)
 
-    # Add probe to get metadata
     nvosd = pipeline.get_by_name("onscreendisplay")
     osdsinkpad = nvosd.get_static_pad("sink")
     if not osdsinkpad:
@@ -166,7 +156,6 @@ def run_pipeline(input_file, output_file):
         return
     osdsinkpad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
 
-    # Start playback and listen to events
     print("Starting pipeline \n")
     pipeline.set_state(Gst.State.PLAYING)
 
@@ -175,7 +164,6 @@ def run_pipeline(input_file, output_file):
     except:
         pass
 
-    # Clean up
     pipeline.set_state(Gst.State.NULL)
 
 if __name__ == '__main__':
