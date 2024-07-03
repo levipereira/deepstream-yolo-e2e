@@ -20,10 +20,6 @@ RUN cd /apps/deepstream-yolo-e2e && \
 RUN cd /apps/deepstream-yolo-e2e && \
     bash TensorRTPlugin/patch_libnvinfer.sh
 
-# Download YOLO models
-RUN cd /apps/deepstream-yolo-e2e/models && \
-    ./download_models.py
-
 # Run ONNX to TensorRT conversion script
 RUN cd /apps/deepstream-yolo-e2e && \
     bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.txt
