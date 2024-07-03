@@ -23,12 +23,6 @@ def bus_call(bus, message, loop):
         loop.quit()
     return True
 
-def is_platform_aarch64():
-    return os.uname().machine == 'aarch64'
-
-def is_integrated_gpu():
-    return is_platform_aarch64()
-
 def osd_sink_pad_buffer_probe(pad, info, u_data):
     # Processing metadata for further use or visualization
     frame_number = 0
@@ -71,7 +65,7 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
 
     return Gst.PadProbeReturn.OK
 
-def create_pipeline(input_file):
+def create_pipeline(input_file, output_file):
     # Initialize GStreamer
     Gst.init(None)
 
@@ -91,7 +85,13 @@ def create_pipeline(input_file):
         "streammux": ("nvstreammux", "stream-muxer"),
         "pgie": ("nvinfer", "primary-inference"),
         "nvvidconv": ("nvvideoconvert", "convertor"),
-        "nvosd": ("nvdsosd", "onscreendisplay")
+        "nvosd": ("nvdsosd", "onscreendisplay"),
+        "nvvidconv2": ("nvvideoconvert", "convertor2"),
+        "cap_filter": ("capsfilter", "capsfilter"),
+        "encoder": ("nvv4l2h264enc", "encoder"),
+        "codeparser": ("h264parse", "h264-parser2"),
+        "container": ("qtmux", "muxer"),
+        "sink": ("filesink", "file-sink")
     }
 
     # Instance and check elements
@@ -102,18 +102,12 @@ def create_pipeline(input_file):
             return None
         elements[name] = element
 
-    # Platform-specific sink creation
-    if is_integrated_gpu() or is_platform_aarch64():
-        elements["sink"] = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
-    else:
-        elements["sink"] = Gst.ElementFactory.make("nveglglessink", "nv-video-renderer")
-
-    if not elements["sink"]:
-        sys.stderr.write("Unable to create sink\n")
-        return None
-
     # Set properties
     elements["source"].set_property('location', input_file)
+    elements["sink"].set_property('location', output_file)
+    elements["encoder"].set_property('bitrate', 2000000)
+    elements["cap_filter"].set_property('caps', Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
+
     if os.environ.get('USE_NEW_NVSTREAMMUX') != 'yes':
         elements["streammux"].set_property('width', 1920)
         elements["streammux"].set_property('height', 1080)
@@ -143,12 +137,17 @@ def create_pipeline(input_file):
     elements["streammux"].link(elements["pgie"])
     elements["pgie"].link(elements["nvvidconv"])
     elements["nvvidconv"].link(elements["nvosd"])
-    elements["nvosd"].link(elements["sink"])
+    elements["nvosd"].link(elements["nvvidconv2"])
+    elements["nvvidconv2"].link(elements["cap_filter"])
+    elements["cap_filter"].link(elements["encoder"])
+    elements["encoder"].link(elements["codeparser"])
+    elements["codeparser"].link(elements["container"])
+    elements["container"].link(elements["sink"])
 
     return pipeline
 
-def run_pipeline(input_file):
-    pipeline = create_pipeline(input_file)
+def run_pipeline(input_file, output_file):
+    pipeline = create_pipeline(input_file, output_file)
 
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
@@ -180,9 +179,10 @@ def run_pipeline(input_file):
     pipeline.set_state(Gst.State.NULL)
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <media file>")
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} <input media file> <output media file>")
         sys.exit(1)
 
     input_file = sys.argv[1]
-    run_pipeline(input_file)
+    output_file = sys.argv[2]
+    run_pipeline(input_file, output_file)

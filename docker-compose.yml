@@ -10,13 +10,10 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    environment:
-      - DISPLAY=${DISPLAY}
-      - XAUTHORITY=${HOME}/.Xauthority
-      - CUDA_CACHE_DISABLE=0
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ${HOME}/.Xauthority:/root/.Xauthority:rw
-      - /usr/lib/x86_64-linux-gnu/GL:/usr/lib/x86_64-linux-gnu/GL
     working_dir: /apps/deepstream-yolo-e2e
-    command: ["python3", "pipeline.py", "/opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4"]
+    command: [
+      "python3",
+      "pipeline.py",
+      "/opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4",
+      "/apps/deepstream-yolo-e2e/output.mp4"
+    ]
