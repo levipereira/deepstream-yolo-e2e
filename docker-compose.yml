@@ -4,8 +4,8 @@ services:
     image: local/deepstream-yolo-e2e:latest
     runtime: nvidia
     environment:
-      - DISPLAY=${DISPLAY}
-      - XAUTHORITY=${XAUTHORITY}
+      - DISPLAY=:1
+      - XAUTHORITY=${HOME}/.Xauthority
       - CUDA_CACHE_DISABLE=0
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
