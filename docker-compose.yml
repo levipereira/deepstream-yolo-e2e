@@ -1,0 +1,19 @@
+services:
+  deepstream:
+    build: .
+    image: local/deepstream-yolo-e2e:latest
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    working_dir: /apps/deepstream-yolo-e2e
+    command: [
+      "python3",
+      "pipeline_test.py",
+      "/opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4",
+      "/apps/deepstream-yolo-e2e/output.mp4"
+    ]
