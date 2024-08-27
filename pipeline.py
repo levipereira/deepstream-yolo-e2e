@@ -18,6 +18,10 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 
 MUXER_BATCH_TIMEOUT_USEC = 33000
+
+MUXER_OUTPUT_WIDTH=1280
+MUXER_OUTPUT_HEIGHT=720
+
 TILED_OUTPUT_WIDTH=1280
 TILED_OUTPUT_HEIGHT=720
 OSD_PROCESS_MODE= 0
@@ -197,13 +201,13 @@ def sink_pad_buffer_probe(pad, info, u_data):
 def create_pipeline(args):
     Gst.init(None)
     stream_input=args.input
-    stream_output=args.output
+    stream_output=args.output.upper()
     smart_record=args.smart_recorder
 
-    number_sources=len(stream_input)-1
+    number_sources=len(stream_input)
     
     global perf_data
-    perf_data = PERF_DATA(len(stream_input) - 1)
+    perf_data = PERF_DATA(len(stream_input))
 
 
 
@@ -250,8 +254,8 @@ def create_pipeline(args):
 
     ## Configure Elements
     if os.environ.get('USE_NEW_NVSTREAMMUX') != 'yes':
-        elements["streammux"].set_property('width', 1920)
-        elements["streammux"].set_property('height', 1080)
+        elements["streammux"].set_property('width', MUXER_OUTPUT_WIDTH)
+        elements["streammux"].set_property('height', MUXER_OUTPUT_HEIGHT)
         elements["streammux"].set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
     elements["streammux"].set_property('batch-size', number_sources)
 
@@ -275,7 +279,7 @@ def create_pipeline(args):
         elements["nvosd"].set_property('display-text',OSD_DISPLAY_TEXT)
 
         if stream_output in ("FILE", "RTSP"):
-            elements["filter_osd"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
+            elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
             elements["encoder"].set_property('bitrate', 4097152)
  
             if stream_output == "FILE":
@@ -297,10 +301,10 @@ def create_pipeline(args):
     for i in range(number_sources):
         # os.mkdir(folder_name + "/stream_" + str(i))
         print("Creating source_bin ", i, " \n ")
-        uri_name = args[i + 1]
+        uri_name = stream_input[i]
         if uri_name.find("rtsp://") == 0:
             is_live = True
-        source_bin = create_source_bin(i, uri_name)
+        source_bin = create_source_bin(i, uri_name, 1)
         if not source_bin:
             sys.stderr.write("Unable to create source bin \n")
         pipeline.add(source_bin)
@@ -317,15 +321,15 @@ def create_pipeline(args):
     elements["streammux"].link(elements["pgie"])
 
     if stream_output == "NONE":
-        element_probe= elements["pgie"]
+        element_probe = elements["pgie"]
         elements["pgie"].link(elements["sink"])
 
     if stream_output in ("FILE", "RTSP", "DISPLAY"):
-        element_probe= elements["tiler"]
+        element_probe = elements["nvtiler"]
         elements["pgie"].link(elements["nvvidconv_tiler"])
         elements["nvvidconv_tiler"].link(elements["filter_tiler"])
-        elements["filter_tiler"].link(elements["tiler"])
-        elements["tiler"].link(elements["nvosd"])
+        elements["filter_tiler"].link(elements["nvtiler"])
+        elements["nvtiler"].link(elements["nvosd"])
         if stream_output in ("FILE", "RTSP"):
             elements["nvosd"].link(elements["nvvidconv_encoder"])
             elements["nvvidconv_encoder"].link(elements["filter_encoder"])
@@ -345,6 +349,10 @@ def create_pipeline(args):
 
 # Function to run the pipeline
 def run_pipeline(args):
+
+    if args.output == "RTSP":
+        create_rtsp_server()
+        
     pipeline, element_probe = create_pipeline(args)
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")

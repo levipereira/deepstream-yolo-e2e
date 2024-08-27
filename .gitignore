@@ -16,3 +16,4 @@ libnvinfer*
 TensorRTPlugin/TensorRT
 .idea/
 *.pyc
+*.mp4
