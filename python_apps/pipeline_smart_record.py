@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 import os
 import gi
@@ -27,7 +28,30 @@ TILED_OUTPUT_HEIGHT=720
 OSD_PROCESS_MODE= 0
 OSD_DISPLAY_TEXT= 1
 
+smart_rec_data = {}
 
+
+def recorder(smart_rec_data):
+    for bin_name, (g_on, ele, session_id) in smart_rec_data.items():
+        if g_on:
+            print(f"Starting {bin_name}")
+            a = pyds.alloc_buffer_sr(4)   
+            
+            print(f"Generated session_id: {session_id}")
+            session_id = ele.emit('start-sr', a, 15, 5, 5, None)
+            smart_rec_data[bin_name] = (not g_on, ele, session_id)
+        else:
+            print(f"Stopping {bin_name}")
+            if session_id:
+                ele.emit('stop-sr', session_id)
+            else:
+                print(f"No session_id found for {bin_name}")
+            # Remova o session_id após parar a gravação
+            smart_rec_data[bin_name] = (not g_on, ele, None)
+    
+    return True
+
+ 
 # Function to handle messages on the bus
 def bus_call(bus, message, loop):
     msg_type = message.type
@@ -41,10 +65,11 @@ def bus_call(bus, message, loop):
     return True
 
 def cb_newpad(decodebin, decoder_src_pad,data):
+
     print("In cb_newpad\n")
     caps=decoder_src_pad.get_current_caps()
-    #if not caps:        
-    #    caps = decoder_src_pad.query_caps()
+    if not caps:        
+        caps = decoder_src_pad.query_caps()
     gststruct=caps.get_structure(0)
     gstname=gststruct.get_name()
     source_bin=data
@@ -73,24 +98,8 @@ def decodebin_child_added(child_proxy, Object, name, user_data):
         if source_element.find_property('drop-on-latency') != None:
             Object.set_property("drop-on-latency", True)
 
-g_on = True
  
-def action(ele):
-    print(ele)
-    global g_on
-    if(g_on):
-        print("start")
-        #a=GLib.malloc0(4)   #print(a)= 139642338822512,  TypeError: could not convert type int to gpointer required for parameter 0
-        a=pyds.alloc_buffer1(4)     
-        print(a)                    #<capsule object NULL at 0x7fa699c64840>
-        ele.emit('start-sr', a, 2, 7, None)
-    else:
-        print("stop")
-        ele.emit('stop-sr', 0)
-    g_on = not g_on
-
-
-def create_source_bin(index,uri, uri_type):
+def create_source_bin(index,uri, smart_record):
     print("Creating source bin")
 
     bin_name="source-bin-%02d" %index
@@ -98,19 +107,20 @@ def create_source_bin(index,uri, uri_type):
     nbin=Gst.Bin.new(bin_name)
     if not nbin:
         sys.stderr.write(" Unable to create source bin \n")
-    if uri_type == 1:
+    if not smart_record:
         uri_decode_bin=Gst.ElementFactory.make("uridecodebin", "uri-decode-bin")
-    if uri_type == 2:
+    if smart_record:
+        global smart_rec_data
         uri_decode_bin=Gst.ElementFactory.make("nvurisrcbin", "uri-decode-bin")
         uri_decode_bin.set_property("cudadec-memtype", 0)
         uri_decode_bin.set_property("smart-record", 2)
+        uri_decode_bin.set_property("smart-rec-cache", 120) 
+        uri_decode_bin.set_property("smart-rec-container", 0)  
+        uri_decode_bin.set_property("smart-rec-mode", 1)  
+        uri_decode_bin.set_property("smart-rec-default-duration", 30)  
+        uri_decode_bin.set_property("smart-rec-file-prefix", bin_name)
         uri_decode_bin.set_property("smart-rec-dir-path", "/apps/deepstream-yolo-e2e/video_recorder/")
-        print(uri_decode_bin)
-        for i in range(5):
-            t = threading.Timer(5*(i+1), action, args=[uri_decode_bin])
-            t.start()
-        print("using nvurisrcbin")
-
+        
     if not uri_decode_bin:
         sys.stderr.write(" Unable to create uri decode bin \n")
     
@@ -123,6 +133,8 @@ def create_source_bin(index,uri, uri_type):
     if not bin_pad:
         sys.stderr.write(" Failed to add ghost pad in source bin \n")
         return None
+    if smart_record:
+        smart_rec_data[bin_name] = (True, uri_decode_bin, None)
     return nbin
 
 def create_rtsp_server():
@@ -202,7 +214,7 @@ def create_pipeline(args):
     Gst.init(None)
     stream_input=args.input
     stream_output=args.output.upper()
-    smart_record=args.smart_recorder
+    
 
     number_sources=len(stream_input)
     
@@ -298,6 +310,8 @@ def create_pipeline(args):
     for element in elements.values():
         pipeline.add(element)
 
+
+    ## Create Sources 
     for i in range(number_sources):
         # os.mkdir(folder_name + "/stream_" + str(i))
         print("Creating source_bin ", i, " \n ")
@@ -349,10 +363,10 @@ def create_pipeline(args):
 
 # Function to run the pipeline
 def run_pipeline(args):
-
+    global smart_rec_data
     if args.output == "RTSP":
         create_rtsp_server()
-        
+
     pipeline, element_probe = create_pipeline(args)
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
@@ -369,6 +383,9 @@ def run_pipeline(args):
         return
     elementsinkpad.add_probe(Gst.PadProbeType.BUFFER, sink_pad_buffer_probe, 0)
     GLib.timeout_add(5000, perf_data.perf_print_callback)
+
+    if args.smart_recorder:
+        GLib.timeout_add(30000, recorder, smart_rec_data)
 
     print("Starting pipeline \n")
     pipeline.set_state(Gst.State.PLAYING)
