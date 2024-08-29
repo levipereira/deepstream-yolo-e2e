@@ -237,7 +237,7 @@ def create_pipeline(args):
     elements["streammux"].set_property('batch-size', number_sources)
 
 
-    elements["pgie"].set_property('config-file-path', "config_pgie_yolo_det.txt")
+    elements["pgie"].set_property('config-file-path', "/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt")
 
     if stream_output == "NONE":
         elements["sink"].set_property('enable-last-sample', 0)

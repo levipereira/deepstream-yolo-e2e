@@ -77,7 +77,7 @@ enable=1
 gpu-id=0
 gie-unique-id=1
 nvbuf-memory-type=0
-config-file=config_pgie_yolo_det.txt
+config-file=/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt
 bbox-border-color80=0.0;0.7529411764705882;0.796078431372549;1
 bbox-border-color1=1.0;1.0;0.0;1
 bbox-border-color2=1.0;0.0;0.0;1
@@ -166,7 +166,7 @@ enable=1
 tracker-width=640
 tracker-height=384
 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
-ll-config-file=./tracker/config_tracker_NvDCF_perf.yml
+ll-config-file=/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml
 gpu-id=0
 display-tracking-id=1
 

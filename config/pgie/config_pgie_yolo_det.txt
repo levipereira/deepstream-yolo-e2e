@@ -2,9 +2,9 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=models/yolov10n-trt.onnx
-model-engine-file=models/yolov10n-trt-fp16-netsize-640-batch-1.engine
-labelfile-path=labels.txt
+onnx-file=/apps/deepstream-yolo-e2e/models/yolov10n-trt.onnx
+model-engine-file=/apps/deepstream-yolo-e2e/models/yolov10n-trt-fp16-netsize-640-batch-1.engine
+labelfile-path=/apps/deepstream-yolo-e2e/models/labels.txt
 batch-size=1
 infer-dims=3;640;640
 force-implicit-batch-dim=0
@@ -19,7 +19,7 @@ network-type=0
 cluster-mode=2
 maintain-aspect-ratio=1
 parse-bbox-func-name=NvDsInferYoloNMS
-custom-lib-path=nvdsinfer_yolo/libnvds_infer_yolo.so
+custom-lib-path=/apps/deepstream-yolo-e2e/nvdsinfer_yolo/libnvds_infer_yolo.so
 
 [class-attrs-all]
 pre-cluster-threshold=0.25

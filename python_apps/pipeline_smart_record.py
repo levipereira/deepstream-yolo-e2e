@@ -38,7 +38,7 @@ def recorder(smart_rec_data):
             a = pyds.alloc_buffer_sr(4)   
             
             print(f"Generated session_id: {session_id}")
-            session_id = ele.emit('start-sr', a, 15, 5, 5, None)
+            session_id = ele.emit('start-sr', a, 5, 5, None)
             smart_rec_data[bin_name] = (not g_on, ele, session_id)
         else:
             print(f"Stopping {bin_name}")
