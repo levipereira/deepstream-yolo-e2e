@@ -113,8 +113,10 @@ fi
 # Update configuration file if provided
 if [ -n "$config_file" ]; then
   if [ -f "$config_file" ]; then
-    onnx_file_line="onnx-file=${file}"
-    engine_file_line="model-engine-file=${engine_filepath}"
+    file_abs_path=$(realpath "$file")
+    engine_abs_path=$(realpath "$engine_filepath")
+    onnx_file_line="onnx-file=${file_abs_path}"
+    engine_file_line="model-engine-file=${engine_abs_path}"
     batch_size_line="batch-size=${batch_size}"
     infer_dims_line="infer-dims=3;${network_size};${network_size}"
     

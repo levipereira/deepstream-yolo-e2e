@@ -19,6 +19,7 @@ import gi
 import sys
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+
 def bus_call(bus, message, loop):
     t = message.type
     if t == Gst.MessageType.EOS:

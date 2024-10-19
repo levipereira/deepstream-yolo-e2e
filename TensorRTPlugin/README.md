@@ -6,22 +6,64 @@ TensorRT OSS build is required. This is required because TensorRT TRT_EfficientN
 - [TRT_EfficientNMSX](https://github.com/levipereira/TensorRT/tree/release/8.6/plugin/efficientNMSPlugin): Same Efficient NMS, but return boxes indices
 
 
-## Downloading TensorRT Build
-
-1. #### Download TensorRT OSS
-	```bash
-    cd TensorRTPlugin
-	git clone -b release/8.6 https://github.com/levipereira/TensorRT TensorRT
-	cd TensorRT
-	git submodule update --init --recursive
-	```
-
 
 ## Setting Up The Build Environment
 
 For Linux platforms, we recommend that you generate a docker container for building TensorRT OSS as described below. 
 
-1. #### Generate the TensorRT-OSS build container. 
+## DEEPSTREAM 7.1
+1. #### Download TensorRT OSS - DeepStream 7.0
+	```bash
+    cd TensorRTPlugin
+	git clone -b release/10.3_efficientnmsx https://github.com/levipereira/TensorRT TensorRT
+	cd TensorRT
+	git submodule update --init --recursive
+	```
+2. #### Generate the TensorRT-OSS build container. 
+    The TensorRT-OSS build container can be generated using the supplied Dockerfiles and build scripts. The build containers are configured for building TensorRT OSS out-of-the-box.
+
+    **Ubuntu 22.04 on x86-64 with cuda-12.6.2/cudnn9 for DeepStream 7.1** 
+    ```bash
+    ./docker/build.sh --file docker/ubuntu-22.04_deepstream_7.1.Dockerfile --tag tensorrt-ubuntu22.04-deepstream71-cuda12.6  
+    ```
+
+3. #### Launch the TensorRT-OSS build container.
+    **Example: Ubuntu 20.04 build container**
+	```bash
+	./docker/launch.sh --tag tensorrt-ubuntu22.04-deepstream71-cuda12.6  --gpus all
+	```
+	> NOTE:
+  <br> `sudo` password for Ubuntu build containers is `nvidia`.
+## Building TensorRT-OSS
+* Generate Makefiles and build.
+
+    **Example: Linux (x86-64) build with default cuda-12.1 - DeepStream 7.0**
+	```bash
+	cd $TRT_OSSPATH
+	mkdir -p build && cd build
+	cmake .. -DTRT_LIB_DIR=$TRT_LIBPATH -DTRT_OUT_DIR=`pwd`/out
+	make -j$(nproc)
+	```
+
+    **Example: Linux (aarch64) build with default cuda-12.1**
+	```bash
+	cd $TRT_OSSPATH
+	mkdir -p build && cd build
+	cmake .. -DTRT_LIB_DIR=$TRT_LIBPATH -DTRT_OUT_DIR=`pwd`/out -DCMAKE_TOOLCHAIN_FILE=$TRT_OSSPATH/cmake/toolchains/cmake_aarch64-native.toolchain
+	make -j$(nproc)
+	```
+
+
+## DEEPSTREAM 7.0
+1. #### Download TensorRT OSS - DeepStream 7.0
+	```bash
+    cd TensorRTPlugin
+	git clone -b release/8.6_efficientnmsx https://github.com/levipereira/TensorRT TensorRT
+	cd TensorRT
+	git submodule update --init --recursive
+	```
+
+2. #### Generate the TensorRT-OSS build container. 
     The TensorRT-OSS build container can be generated using the supplied Dockerfiles and build scripts. The build containers are configured for building TensorRT OSS out-of-the-box.
 
     **Ubuntu 20.04 on x86-64 with cuda-12.1 (DeepStream 7.0)** 
@@ -37,7 +79,7 @@ For Linux platforms, we recommend that you generate a docker container for build
     ./docker/build.sh --file docker/ubuntu-20.04-aarch64.Dockerfile --tag tensorrt-aarch64-ubuntu20.04-cuda11.8 --cuda 11.8.0
     ```
 
-2. #### Launch the TensorRT-OSS build container.
+3. #### Launch the TensorRT-OSS build container.
     **Example: Ubuntu 20.04 build container**
 	```bash
 	./docker/launch.sh --tag tensorrt-ubuntu20.04-cuda12.1 --gpus all

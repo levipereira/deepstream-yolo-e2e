@@ -145,6 +145,29 @@ sudo  docker run \
 bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 ```
 
+### 4. **Install Deepstream Python Binds**
+To install the DeepStream Python bindings, run the following command in your terminal, depending on the version of DeepStream you are using. 
+
+**This step is required only if you plan to use the code in Python.**
+
+#### DeepStream 7.1
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.2.0
+```
+#### DeepStream 7.0
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.11
+```
+
+#### DeepStream 6.4
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.10
+```
+#### DeepStream 6.3
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.8
+```
+
 ### 4. **Build Parse Function nvdsinfer_yolo used by PGIE**
 ```bash
 cd /apps/deepstream-yolo-e2e
@@ -188,13 +211,40 @@ bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.
 ```
 
 
-### 6. Run Application
-```bash
-## Detection
-deepstream-app -c deepstream_yolov9_det.txt
+### 6. Run DeepStream Application
 
-## Segmentation
-deepstream-app -c deepstream_yolov9_mask.txt
+#### 6.1 DeepStream Reference Application
+You can run the DeepStream reference application for both detection and segmentation tasks using the following commands:
+
+#### Detection
+```bash
+deepstream-app -c config/deepstream_app/deepstream_yolo_det.txt
+```
+
+#### Segmentation/Mask
+```bash
+deepstream-app -c config/deepstream_app/deepstream_yolov9_mask.txt
+```
+
+#### 6.2 Run DeepStream Python Application
+To run the DeepStream Python application for detection and segmentation, navigate to the `python_apps` directory and execute the following commands:
+
+#### Detection
+```bash
+cd python_apps
+./main.py \
+   -i file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4 \
+   -o display \
+   -mt det
+```
+#### Segmentation/Mask
+
+```bash
+cd python_apps
+./main.py \
+   -i file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4 \
+   -o display \
+   -mt seg
 ```
 
 
