@@ -19,7 +19,7 @@ Now, you can integrate **videos directly from YouTube** into your pipeline. 📹
 ## DeepStream Version Support
 | DeepStream Version | dGPU/X86 | Jetson |
 |--------------------|----------|--------|
-| 7.1                | ✅        | ✅      |
+| 7.1                | ✅        | <span style="color:red">❌</span>       |
 | 7.0                | ✅        | ✅      |
 | 6.4                | ✅        | ✅      |
 | 6.3                | ✅        | ✅      |
