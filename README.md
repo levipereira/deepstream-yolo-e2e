@@ -91,9 +91,9 @@ These future implementations aim to expand the range of models supported by this
 # Prerequisites
 
 ## 1. Nvidia GPU
-Make sure you have an Nvidia GPU installed on your system and that the latest drivers are properly configured. Download and install the GPU drivers from the official Nvidia website:
-
-[Nvidia Drivers Download](https://www.nvidia.com/pt-br/drivers/)
+Make sure you have an Nvidia GPU installed on your system and that the latest drivers are properly configured. 
+Download and install the GPU drivers from the official Nvidia website:
+[Nvidia Drivers Download](https://www.nvidia.com/en-us/drivers/)
 
 ## 2. Docker
 Docker is required for creating and managing containers, simplifying development and deployment. 
@@ -107,6 +107,7 @@ sudo usermod -aG docker $USER
  ## 3. NVIDIA Container Toolkit
 The NVIDIA Container Toolkit allows Docker containers to utilize the Nvidia GPU to accelerate your applications. 
 To install the toolkit, follow the official guide:
+
 [NVIDIA Container Toolkit Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 After installation, verify that the setup is correct by running a GPU-enabled container:
