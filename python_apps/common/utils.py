@@ -17,32 +17,15 @@
 
 import ctypes
 import sys
-import os
-import configparser
 sys.path.append('/opt/nvidia/deepstream/deepstream/lib')
 
 def long_to_uint64(l):
     value = ctypes.c_uint64(l & 0xffffffffffffffff).value
     return value
 
-def parse_config(config_file):
-    config = configparser.ConfigParser()
-    config.read(config_file)
-
-    media_entries = []
-
-    for section in config.sections():
-        enable = config.getint(section, 'enable')
-        if enable == 1:
-            type = config.get(section, 'type')
-            url = config.get(section, 'url')
-
-            if not os.path.isfile(url) and type == 'file':
-                print(f"File not found: {url}")
-            if type == "file":
-                url = f"file://{url}"
-            media_entries.append((type, url))
-    return media_entries
 
 
+
+
+        
  

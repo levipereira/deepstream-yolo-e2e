@@ -9,11 +9,10 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst,GLib
 
 from common.FPS import PERF_DATA
-from component.source_factory import create_source_bin
+from component.source_factory import create_source_bin , parse_media_source
 from component.rtsp_server import create_rtsp_server
 from component.probes import sink_pad_buffer_probe
 from common.bus_call import bus_call
-from common.utils import parse_config
 import subprocess
 
 config = configparser.ConfigParser()
@@ -36,7 +35,7 @@ def create_pipeline(args):
     model_type = args.model_type
     
     output_file_path=None
-    media_sources = parse_config('config/media.ini')
+    media_sources = parse_media_source('config/media.ini')
 
     number_sources = len(media_sources)
     if number_sources == 0:
@@ -157,27 +156,9 @@ def create_pipeline(args):
 
 
     ## Create Sources 
-    for index, (media, url) in enumerate(media_sources):
-        print("Creating source_bin ", index, " \n ")
-        uri_name = url
-        if media == 'youtube':
-            try:
-                # Run yt-dlp to get the stream URL
-                result = subprocess.run(
-                    ['yt-dlp', '--get-url', url],
-                    capture_output=True,
-                    text=True,
-                    check=True
-                )
-                # result.stdout will contain the direct stream URL, so update uri_name
-                uri_name = result.stdout.strip()
-                #print("Stream URL obtained:", uri_name)
-            except subprocess.CalledProcessError as e:
-                print(f"Error obtaining YouTube URL: {e}")
-                raise
-
-     
-        source_bin = create_source_bin(index, uri_name)
+    for index, (media, url, uri) in enumerate(media_sources):
+        print(f"Source: {url}. Creating source_bin {index} \n ")
+        source_bin = create_source_bin(index, uri)
         if not source_bin:
             sys.stderr.write("Unable to create source bin \n")
         pipeline.add(source_bin)

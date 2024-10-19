@@ -71,7 +71,7 @@ fi
 precision_flags=""
 case $precision in
   fp32)
-    precision_flags="--fp32"
+    precision_flags=""
     ;;
   fp16)
     precision_flags="--fp16"

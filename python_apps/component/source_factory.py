@@ -1,7 +1,13 @@
 import sys
 import gi
+import os
+import configparser
+import subprocess
+from component.yt_factory import get_yt_uri
+
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+
 
 def cb_newpad(decodebin, decoder_src_pad,data):
 
@@ -36,6 +42,8 @@ def decodebin_child_added(child_proxy, Object, name, user_data):
         source_element = child_proxy.get_by_name("source")
         if source_element.find_property('drop-on-latency') != None:
             Object.set_property("drop-on-latency", True)
+#    if "souphttpsrc" in name:
+#        Object.set_property("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
 
  
 def create_source_bin(index,uri):
@@ -62,3 +70,26 @@ def create_source_bin(index,uri):
         sys.stderr.write(" Failed to add ghost pad in source bin \n")
         return None
     return nbin
+
+
+def parse_media_source(config_file):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    media_entries = []
+
+    for section in config.sections():
+        enable = config.getint(section, 'enable')
+        if enable == 1:
+            type = config.get(section, 'type')
+            url = config.get(section, 'url')
+            uri = config.get(section, 'url')
+
+            if not os.path.isfile(url) and type == 'file':
+                print(f"File not found: {url}")
+            if type == "file":
+                uri = f"file://{url}"
+            if type == 'youtube':
+                uri = get_yt_uri(url)
+            media_entries.append((type,url,uri))
+    return media_entries
