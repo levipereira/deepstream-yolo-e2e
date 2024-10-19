@@ -5,7 +5,7 @@
 You can run the application using the following command-line arguments:
 
 ```bash
-python pipeline_yolo.py -i <input_streams> -mt <model_type> -o <output>
+python pipeline_yolo.py -mt <model_type> -o <output>
 ```
 
 ## Command Line Arguments
@@ -27,7 +27,7 @@ python pipeline_yolo.py -i <input_streams> -mt <model_type> -o <output>
 **For detection:**
 
 ```bash
-python pipeline_yolo.py  -mt det -o display
+python pipeline_yolo.py -mt det -o display
 ```
 
 **For Segmentation:**
