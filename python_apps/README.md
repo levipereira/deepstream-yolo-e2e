@@ -12,7 +12,6 @@ python pipeline_yolo.py -i <input_streams> -mt <model_type> -o <output>
 
 | Argument          | Short Form | Description                                                | Required |
 |-------------------|------------|------------------------------------------------------------|----------|
-| `--input`         | `-i`       | Path(s) to input streams (URIs).                           | Yes      |
 | `--model-type`    | `-mt`      | Type of model to use (detection or segmentation). Choices: `det` for detection, `seg` for segmentation. | Yes      |
 | `--output`        | `-o`       | Output method. Choices: `display`, `file`, `rtsp`, `silent`. | Yes      |
 
@@ -28,7 +27,7 @@ python pipeline_yolo.py -i <input_streams> -mt <model_type> -o <output>
 **For detection:**
 
 ```bash
-python pipeline_yolo.py -i file:///path/to/video.mp4 -mt det -o display
+python pipeline_yolo.py  -mt det -o display
 ```
 
 **For Segmentation:**
