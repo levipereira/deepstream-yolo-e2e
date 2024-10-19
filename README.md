@@ -10,22 +10,24 @@ This repository offers an optimized implementation of End-to-End YOLO models for
 
 We have introduced **Python bindings** in this version, significantly simplifying the process for users to develop and customize applications according to their specific needs. 🐍 With these bindings, users can easily extend their application's capabilities, making it ideal for rapid prototyping.
 
-### 🎥 Special Feature: Direct YouTube Video Integration
+### 🎥 Special Feature: Direct YouTube Video Integration 
 
 Now, you can integrate **videos directly from YouTube** into your pipeline. 📹 This feature enables seamless streaming and processing of YouTube videos, providing an expanded range of input sources for real-time analytics and AI-driven insights. 🌐 It’s perfect for scenarios where accessing online video data is essential, opening up new possibilities for multimedia applications. 
 
+> **Note:** This feature is available only in the Python application.
 
 ## DeepStream Version Support
 | DeepStream Version | dGPU/X86 | Jetson |
 |--------------------|----------|--------|
-| 6.2                | ✅        | ✅      |
-| 6.3                | ✅        | ✅      |
-| 6.4                | ✅        | ✅      |
-| 7.0                | ✅        | ✅      |
 | 7.1                | ✅        | ✅      |
+| 7.0                | ✅        | ✅      |
+| 6.4                | ✅        | ✅      |
+| 6.3                | ✅        | ✅      |
+| 6.2                | ✅        | ✅      |
+| 6.1                | <span style="color:red">❌</span>        | <span style="color:red">❌</span>     |
 
 
->Note: [DeepStream 7.0 is now supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
+>Note: [DeepStream 7.0 and later is supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
 
 ## Supported End2End Models
 
@@ -99,9 +101,10 @@ git submodule update --init --recursive
 ```
 
 ### 2. **Run Deepstream Container**
+In this example, we will use **DeepStream 7.1**.
 
 ```bash
-sudo docker pull nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+sudo docker pull nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 Start the docker container from `deepstream-yolo-e2e` dir:
 
@@ -120,7 +123,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 #### 2.2 Linux
@@ -136,7 +139,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 #### 2.3 Jetson
@@ -152,7 +155,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 
