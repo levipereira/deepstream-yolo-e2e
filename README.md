@@ -88,6 +88,31 @@ With all models standardized with output layers ensure consistency across all YO
 
 These future implementations aim to expand the range of models supported by this repository, offering enhanced capabilities for your projects.
 
+# Prerequisites
+
+## 1. Nvidia GPU
+Make sure you have an Nvidia GPU installed on your system and that the latest drivers are properly configured. Download and install the GPU drivers from the official Nvidia website:
+
+[Nvidia Drivers Download](https://www.nvidia.com/pt-br/drivers/)
+
+## 2. Docker
+Docker is required for creating and managing containers, simplifying development and deployment. 
+To install Docker on Ubuntu, use the convenience script:<br>
+[Docker Installation Guide for Ubuntu](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script)
+
+After the installation, add your user to the docker group to run Docker commands without sudo:
+```bash
+sudo usermod -aG docker $USER
+```
+ ## 3. NVIDIA Container Toolkit
+The NVIDIA Container Toolkit allows Docker containers to utilize the Nvidia GPU to accelerate your applications. 
+To install the toolkit, follow the official guide:
+[NVIDIA Container Toolkit Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
+After installation, verify that the setup is correct by running a GPU-enabled container:
+```bash
+docker run --gpus all nvidia/cuda:12.0-base nvidia-smi
+```
 
 # Project Workflow 
 
