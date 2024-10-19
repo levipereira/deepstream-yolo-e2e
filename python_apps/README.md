@@ -70,12 +70,14 @@ Each section contains the following parameters:
 - **type**: Specifies the type of media source. Possible values include:
   - `file`: Indicates that the media is a file on the local filesystem.
   - `rtsp`: Indicates that the media source is a Real-Time Streaming Protocol (RTSP) stream.
-  
+  - `youtube`: Indicates that the media source is a YouTube video.
+
 - **url**: Provides the path or URL to the media source.
 
 - **enable**: A binary flag (0 or 1) indicating whether the media source is active:
   - `1`: The media source is enabled and will be processed.
   - `0`: The media source is disabled and will be ignored by the application.
+
 
 
 ## General Configuration Settings
