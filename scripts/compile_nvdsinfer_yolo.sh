@@ -14,5 +14,5 @@ fi
 export CUDA_VER=$cuda_dir
 
 # Execute the make command with the detected CUDA version
-make -C nvdsinfer_yolo CUDA_VER=$CUDA_VER
+make install -C nvdsinfer_yolo CUDA_VER=$CUDA_VER   
 

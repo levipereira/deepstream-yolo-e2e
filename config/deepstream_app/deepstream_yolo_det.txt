@@ -11,6 +11,7 @@ height=720
 gpu-id=0
 nvbuf-memory-type=0
 
+
 [source0]
 enable=1
 type=3
@@ -18,6 +19,7 @@ uri=file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.m
 num-sources=1
 gpu-id=0
 cudadec-memtype=0
+
 
 [sink0]
 enable=1
@@ -47,12 +49,9 @@ source-id=0
 
 [osd]
 enable=1
-display-mask=1
-display-bbox=0
-display-text=1
 gpu-id=0
 border-width=3
-text-size=11
+text-size=12
 text-color=1;1;1;1;
 text-bg-color=0.3;0.3;0.3;1
 font=Serif
@@ -62,7 +61,6 @@ clock-y-offset=820
 clock-text-size=12
 clock-color=1;0;0;0
 nvbuf-memory-type=0
-
 
 [streammux]
 gpu-id=0
@@ -77,10 +75,9 @@ nvbuf-memory-type=0
 [primary-gie]
 enable=1
 gpu-id=0
-batch-size=1
 gie-unique-id=1
 nvbuf-memory-type=0
-config-file=config_pgie_yolo_seg.txt
+config-file=/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt
 bbox-border-color80=0.0;0.7529411764705882;0.796078431372549;1
 bbox-border-color1=1.0;1.0;0.0;1
 bbox-border-color2=1.0;0.0;0.0;1
@@ -169,10 +166,9 @@ enable=1
 tracker-width=640
 tracker-height=384
 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
-ll-config-file=./tracker/config_tracker_NvDCF_perf.yml
+ll-config-file=/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml
 gpu-id=0
 display-tracking-id=1
-
 
 [tests]
 file-loop=0

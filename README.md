@@ -6,29 +6,47 @@ Implementation of End-to-End YOLO Detection and Segmentation Models for DeepStre
 
 This repository offers an optimized implementation of End-to-End YOLO models for DeepStream, enhancing inference efficiency by integrating Non-Maximum Suppression (NMS) directly into the YOLO models. This approach supports dynamic batch sizes and input sizes, providing seamless adaptability.
 
-## DeepStream Version Support
-This repository supports DeepStream versions 6.2, 6.3, 6.4, and 7.0 for both dGPU/X86 and Jetson platforms.
+### 🌟 New Feature: Python Bindings for Enhanced Application Development
 
->Note: [DeepStream 7.0 is now supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
+We have introduced **Python bindings** in this version, significantly simplifying the process for users to develop and customize applications according to their specific needs. 🐍 With these bindings, users can easily extend their application's capabilities, making it ideal for rapid prototyping.
+
+### 🎥 Special Feature: Direct YouTube Video Integration 
+
+Now, you can integrate **videos directly from YouTube** into your pipeline. 📹 This feature enables seamless streaming and processing of YouTube videos, providing an expanded range of input sources for real-time analytics and AI-driven insights. 🌐 It’s perfect for scenarios where accessing online video data is essential, opening up new possibilities for multimedia applications. 
+
+> **Note:** This feature is available only in the Python application.
+
+## DeepStream Version Support
+| DeepStream Version | dGPU/X86 | Jetson |
+|--------------------|----------|--------|
+| 7.1                | ✅        | ✅      |
+| 7.0                | ✅        | ✅      |
+| 6.4                | ✅        | ✅      |
+| 6.3                | ✅        | ✅      |
+| 6.2                | ✅        | ✅      |
+| 6.1                | <span style="color:red">❌</span>        | <span style="color:red">❌</span>     |
+
+
+>Note: [DeepStream 7.0 and later is supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
 
 ## Supported End2End Models
 
-### Detection 
+### Detection Models
 
 | Model    | Feature   | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMS |
 |----------|-----------|:-------------:|:-----------------:|:--------:|:-------------:|
-| YOLOv10  | Detection |     ✓         |         ✓          |    ✓     |               |
-| YOLOv9   | Detection |     ✓         |         ✓          |    ✓     |       ✓       |
-| YOLOv8   | Detection |     ✓         |         ✓          |          |       ✓       |
-| YOLOv7   | Detection |     ✓         |         ✓          |          |       ✓       |
+| YOLOv10  | Detection |       ✅       |         ✅         |     ✅    |   <span style="color:red">❌</span>   |
+| YOLOv9   | Detection |       ✅       |         ✅         |     ✅    |       ✅       |
+| YOLOv8   | Detection |       ✅       |         ✅         | <span style="color:red">❌</span> |       ✅       |
+| YOLOv7   | Detection |       ✅       |         ✅         | <span style="color:red">❌</span> |       ✅       |
 
-#### Instance Segmentation 
+### Instance Segmentation Models
 
 | Model    | Feature      | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMSX / RoiAlign |
-|----------|--------------|:-------------:|:-----------------:|:--------:|:--------:|
-| YOLOv9   | Segmentation |     ✓         |         ✓          |          |    ✓     |
-| YOLOv8   | Segmentation |     ✓         |         ✓          |          |    ✓     |
-| YOLOv7   | Segmentation |     ✓         |         ✓          |          |    ✓     |
+|----------|--------------|:-------------:|:-----------------:|:--------:|:-------------------------:|
+| YOLOv9   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
+| YOLOv8   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
+| YOLOv7   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
 
 **Dynamic Shapes** - TensorRT enables the creation of network resolutions different from the original exported ONNX.
 
@@ -83,9 +101,10 @@ git submodule update --init --recursive
 ```
 
 ### 2. **Run Deepstream Container**
+In this example, we will use **DeepStream 7.1**.
 
 ```bash
-sudo docker pull nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+sudo docker pull nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 Start the docker container from `deepstream-yolo-e2e` dir:
 
@@ -104,7 +123,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 #### 2.2 Linux
@@ -120,7 +139,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 #### 2.3 Jetson
@@ -136,7 +155,7 @@ sudo  docker run \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v `pwd`:/apps/deepstream-yolo-e2e \
         -w /apps/deepstream-yolo-e2e \
-        nvcr.io/nvidia/deepstream:7.0-triton-multiarch
+        nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 
 
@@ -145,7 +164,30 @@ sudo  docker run \
 bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
 ```
 
-### 4. **Build Parse Function nvdsinfer_yolo used by PGIE**
+### 4. **Install Deepstream Python Binds**
+To install the DeepStream Python bindings, run the following command in your terminal, depending on the version of DeepStream you are using. 
+
+**This step is required only if you plan to use the code in Python.**
+
+#### DeepStream 7.1
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.2.0
+```
+#### DeepStream 7.0
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.11
+```
+
+#### DeepStream 6.4
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.10
+```
+#### DeepStream 6.3
+```bash
+/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.8
+```
+
+### 5. **Build Parse Function nvdsinfer_yolo used by PGIE**
 ```bash
 cd /apps/deepstream-yolo-e2e
 bash scripts/compile_nvdsinfer_yolo.sh
@@ -154,22 +196,30 @@ bash scripts/compile_nvdsinfer_yolo.sh
 ### 5. **Optional: Patch libnvinfer_plugin to Add EfficientNMX plugin**
 >  Important: This step is **mandatory** if you plan to use segmentation models.
 ```bash
-cd /apps/deepstream-yolo-e2e
-bash TensorRTPlugin/patch_libnvinfer.sh
+cd /apps/deepstream-yolo-e2e/TensorRTPlugin
+bash ./patch_libnvinfer.sh
 ```
 
+### 7. **Install `yt-dlp` and `ffmpeg` for YouTube Stream Support**
+To enable YouTube streaming support in your Python applications, you need to install `yt-dlp` and `ffmpeg`
 
-### 6. **Download YOLO models**
+```bash
+apt-get install ffmpeg  -y
+pip3 install yt-dlp
+```
+
+### 8. **Download YOLO models**
 ```
 cd /apps/deepstream-yolo-e2e/models
 ./download_models.py
 ```
 
-### 6. **Convert Models ONNX to TensorRT**
+### 9. **Convert Models ONNX to TensorRT**
 This script converts an ONNX file to a TensorRT engine. 
 >**Note** This process may take up to 15 minutes due to the building Engine File with FP16 precision.
 
-```
+```bash
+cd /apps/deepstream-yolo-e2e/
 scripts/onnx_to_trt.sh -f file.onnx [-b batch_size] [-n network_size] [-p precision] [-c config_file] [--force]
 ```
 
@@ -188,13 +238,45 @@ bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.
 ```
 
 
-### 6. Run Application
-```bash
-## Detection
-deepstream-app -c deepstream_yolov9_det.txt
+### 10. Run DeepStream Application
 
-## Segmentation
-deepstream-app -c deepstream_yolov9_mask.txt
+#### 10.1 Run DeepStream Python Application
+To run the DeepStream Python application for detection and segmentation, navigate to the `python_apps` directory and execute the following commands:
+
+For more detailed information, please refer to the [`python_apps`](python_apps).
+
+#### Configure Media Source
+To configure your media settings, please edit the file located at `python_apps/config/media.ini`. In this file, you can select the media source from the following options:
+
+- **File**: Specify a local media file.
+- **RTSP**: Stream video from an RTSP source.
+- **YouTube**: Integrate directly with YouTube videos.
+
+#### Detection
+```bash
+cd /apps/deepstream-yolo-e2e/python_apps
+./main.py --output display --model-type det
+```
+#### Segmentation
+
+```bash
+cd /apps/deepstream-yolo-e2e/python_apps
+./main.py --output display --model-type seg
+```
+
+#### 10.2 DeepStream Reference Application
+You can run the DeepStream reference application for both detection and segmentation tasks using the following commands:
+
+#### Detection
+```bash
+cd /apps/deepstream-yolo-e2e/
+deepstream-app -c config/deepstream_app/deepstream_yolo_det.txt
+```
+
+#### Segmentation
+```bash
+cd /apps/deepstream-yolo-e2e/
+deepstream-app -c config/deepstream_app/deepstream_yolov9_mask.txt
 ```
 
 

@@ -18,6 +18,7 @@ URLs["libnvinfer_plugin.so.8.5.2.x86_64"]="https://github.com/levipereira/deepst
 URLs["libnvinfer_plugin.so.8.5.3.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.5.3.x86_64"
 URLs["libnvinfer_plugin.so.8.6.1.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.x86_64"
 URLs["libnvinfer_plugin.so.8.6.2.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.2.x86_64"
+URLs["libnvinfer_plugin.so.10.3.0.x86_64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.10.3.0.x86_64"
 
 # aarch64 URLs
 URLs["libnvinfer_plugin.so.8.6.1.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.aarch64"
