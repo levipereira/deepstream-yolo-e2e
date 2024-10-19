@@ -240,20 +240,7 @@ bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.
 
 ### 10. Run DeepStream Application
 
-#### 10.1 DeepStream Reference Application
-You can run the DeepStream reference application for both detection and segmentation tasks using the following commands:
-
-#### Detection
-```bash
-deepstream-app -c config/deepstream_app/deepstream_yolo_det.txt
-```
-
-#### Segmentation
-```bash
-deepstream-app -c config/deepstream_app/deepstream_yolov9_mask.txt
-```
-
-#### 10.2 Run DeepStream Python Application
+#### 10.1 Run DeepStream Python Application
 To run the DeepStream Python application for detection and segmentation, navigate to the `python_apps` directory and execute the following commands:
 
 For more detailed information, please refer to the [`python_apps`](python_apps).
@@ -267,14 +254,29 @@ To configure your media settings, please edit the file located at `python_apps/c
 
 #### Detection
 ```bash
-cd python_apps
+cd /apps/deepstream-yolo-e2e/python_apps
 ./main.py --output display --model-type det
 ```
 #### Segmentation
 
 ```bash
-cd python_apps
+cd /apps/deepstream-yolo-e2e/python_apps
 ./main.py --output display --model-type seg
+```
+
+#### 10.2 DeepStream Reference Application
+You can run the DeepStream reference application for both detection and segmentation tasks using the following commands:
+
+#### Detection
+```bash
+cd /apps/deepstream-yolo-e2e/
+deepstream-app -c config/deepstream_app/deepstream_yolo_det.txt
+```
+
+#### Segmentation
+```bash
+cd /apps/deepstream-yolo-e2e/
+deepstream-app -c config/deepstream_app/deepstream_yolov9_mask.txt
 ```
 
 
