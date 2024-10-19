@@ -106,8 +106,6 @@ OUTPUT_DIRECTORY = ./videos_output
 OUTPUT_PREFIX = deepstream_out
 
 RTSP_PORT = 8554
-RTSP_USER = deepstream
-RTSP_PASSWORD = deepstream
 RTSP_FACTORY = "/live"
 RTSP_UDPSYNC = 8255
 
