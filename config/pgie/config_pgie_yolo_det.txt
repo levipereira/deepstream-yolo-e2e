@@ -19,7 +19,7 @@ network-type=0
 cluster-mode=2
 maintain-aspect-ratio=1
 parse-bbox-func-name=NvDsInferYoloNMS
-custom-lib-path=/apps/deepstream-yolo-e2e/nvdsinfer_yolo/libnvds_infer_yolo.so
+custom-lib-path=/opt/nvidia/deepstream/deepstream/lib/libnvds_infer_yolo.so
 
 [class-attrs-all]
 pre-cluster-threshold=0.25

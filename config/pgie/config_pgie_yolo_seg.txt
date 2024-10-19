@@ -21,7 +21,7 @@ cluster-mode=4
 maintain-aspect-ratio=1
 symmetric-padding=1
 parse-bbox-instance-mask-func-name=NvDsInferYoloMask
-custom-lib-path=/apps/deepstream-yolo-e2e/nvdsinfer_yolo/libnvds_infer_yolo.so
+custom-lib-path=/opt/nvidia/deepstream/deepstream/lib/libnvds_infer_yolo.so
 output-instance-mask=1
 segmentation-threshold=0.5
 

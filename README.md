@@ -193,8 +193,8 @@ bash scripts/compile_nvdsinfer_yolo.sh
 ### 5. **Optional: Patch libnvinfer_plugin to Add EfficientNMX plugin**
 >  Important: This step is **mandatory** if you plan to use segmentation models.
 ```bash
-cd /apps/deepstream-yolo-e2e
-bash TensorRTPlugin/patch_libnvinfer.sh
+cd /apps/deepstream-yolo-e2e/TensorRTPlugin
+bash ./patch_libnvinfer.sh
 ```
 
 ### 7. **Install `yt-dlp` and `ffmpeg` for YouTube Stream Support**
@@ -202,7 +202,7 @@ To enable YouTube streaming support in your Python applications, you need to ins
 
 ```bash
 apt-get install ffmpeg  -y
-python3 -m pip install -U --pre "yt-dlp[default]"
+pip3 install yt-dlp
 ```
 
 ### 8. **Download YOLO models**
@@ -215,7 +215,8 @@ cd /apps/deepstream-yolo-e2e/models
 This script converts an ONNX file to a TensorRT engine. 
 >**Note** This process may take up to 15 minutes due to the building Engine File with FP16 precision.
 
-```
+```bash
+cd /apps/deepstream-yolo-e2e/
 scripts/onnx_to_trt.sh -f file.onnx [-b batch_size] [-n network_size] [-p precision] [-c config_file] [--force]
 ```
 
