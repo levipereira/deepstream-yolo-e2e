@@ -104,7 +104,7 @@ git submodule update --init --recursive
 In this example, we will use **DeepStream 7.1**.
 
 ```bash
-sudo docker pull nvcr.io/nvidia/deepstream:7.1-triton-multiarch
+docker pull nvcr.io/nvidia/deepstream:7.1-triton-multiarch
 ```
 Start the docker container from `deepstream-yolo-e2e` dir:
 
