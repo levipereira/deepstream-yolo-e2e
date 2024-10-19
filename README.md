@@ -110,7 +110,7 @@ Start the docker container from `deepstream-yolo-e2e` dir:
 
 #### 2.1 Windows WSL
 ```bash
-sudo  docker run \
+docker run \
         -it \
         --privileged \
         --rm \
@@ -128,7 +128,7 @@ sudo  docker run \
 
 #### 2.2 Linux
 ```bash
-sudo  docker run \
+docker run \
         -it \
         --privileged \
         --rm \
@@ -144,7 +144,7 @@ sudo  docker run \
 
 #### 2.3 Jetson
 ```bash
-sudo  docker run \
+docker run \
         -it \
         --privileged \
         --rm \
