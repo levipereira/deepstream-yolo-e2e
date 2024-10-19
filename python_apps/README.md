@@ -5,7 +5,7 @@
 You can run the application using the following command-line arguments:
 
 ```bash
-python pipeline_yolo.py -mt <model_type> -o <output>
+python main.py -mt <model_type> -o <output>
 ```
 
 ## Command Line Arguments
@@ -27,13 +27,13 @@ python pipeline_yolo.py -mt <model_type> -o <output>
 **For detection:**
 
 ```bash
-python pipeline_yolo.py -mt det -o display
+python main.py -mt det -o display
 ```
 
 **For Segmentation:**
 
 ```bash
-python pipeline_yolo.py  -mt seg -o display
+python main.py  -mt seg -o display
 ```
 
 # Media Configuration File
