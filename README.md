@@ -261,7 +261,12 @@ scripts/onnx_to_trt.sh -f file.onnx [-b batch_size] [-n network_size] [-p precis
 
 ```
 cd /apps/deepstream-yolo-e2e
-bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config_pgie_yolo_det.txt
+bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config/pgie/config_pgie_yolo_det.txt 
+```
+
+```
+cd /apps/deepstream-yolo-e2e
+bash scripts/onnx_to_trt.sh -f models/yolov10n-seg-trt.onnx -c config/pgie/config_pgie_yolo_seg.txt 
 ```
 
 
