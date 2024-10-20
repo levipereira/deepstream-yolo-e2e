@@ -42,7 +42,7 @@ This repository includes a media configuration file named `media.ini`, located i
 
 ## File Structure
 
-The `media.ini` file is structured as follows:
+The [`config/media.ini`](config/media.ini) file is structured as follows:
 
 ```ini
 [MediaSettings-0]
@@ -111,7 +111,7 @@ For example, if you use the default settings, the URL would be:
 rtsp://<server_ip>:8554/live
 ```
 
-The application can be configured using the `config/config.init` file. <br> Below are the key settings you can modify:
+The application can be configured using the [`config/config.ini`](config/config.ini) file. <br> Below are the key settings you can modify:
 
 
 
