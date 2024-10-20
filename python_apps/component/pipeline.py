@@ -3,30 +3,18 @@ import sys
 import os
 import math
 from datetime import datetime
-import configparser
-import gi
+import gi # type: ignore
 gi.require_version('Gst', '1.0')
-from gi.repository import Gst,GLib
+from gi.repository import Gst,GLib # type: ignore
 
 from common.FPS import PERF_DATA
 from component.source_factory import create_source_bin , parse_media_source
 from component.rtsp_server import create_rtsp_server
 from component.probes import sink_pad_buffer_probe
 from common.bus_call import bus_call
-import subprocess
+from common.constants import *
 
-config = configparser.ConfigParser()
-config.read('config/config.ini')
-
-MUXER_BATCH_TIMEOUT_USEC = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
-MUXER_OUTPUT_WIDTH = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
-MUXER_OUTPUT_HEIGHT = config.getint('Settings', 'MUXER_OUTPUT_HEIGHT')
-
-TILED_OUTPUT_WIDTH = config.getint('Settings', 'TILED_OUTPUT_WIDTH')
-TILED_OUTPUT_HEIGHT = config.getint('Settings', 'TILED_OUTPUT_HEIGHT')
-OSD_PROCESS_MODE = config.getint('Settings', 'OSD_PROCESS_MODE')
-OSD_DISPLAY_TEXT = config.getint('Settings', 'OSD_DISPLAY_TEXT')
-RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
+os.environ['USE_NEW_NVSTREAMMUX'] = 'yes'
 
 # Function to create the pipeline
 def create_pipeline(args):
@@ -92,11 +80,12 @@ def create_pipeline(args):
         elements["streammux"].set_property('height', MUXER_OUTPUT_HEIGHT)
         elements["streammux"].set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
     elements["streammux"].set_property('batch-size', number_sources)
+    elements["streammux"].set_property('config-file-path', CONFIG_NEW_STREAMMUX_PATH)
 
     if model_type == 'det':
-        elements["pgie"].set_property('config-file-path', "/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt")
+        elements["pgie"].set_property('config-file-path', CONFIG_PGIE_YOLO_DET_PATH)
     elif model_type == 'seg':
-        elements["pgie"].set_property('config-file-path', "/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_seg.txt")
+        elements["pgie"].set_property('config-file-path', CONFIG_PGIE_YOLO_SEG_PATH)
     else:
         sys.stderr.write(f"Model Type not supported {model_type}\n")
         exit
@@ -163,6 +152,7 @@ def create_pipeline(args):
             sys.stderr.write("Unable to create source bin \n")
         pipeline.add(source_bin)
         padname = "sink_%u" % index
+        # sinkpad = elements["streammux"].request_pad_simple(padname)
         sinkpad = elements["streammux"].request_pad_simple(padname)
         if not sinkpad:
             sys.stderr.write("Unable to create sink pad bin \n")

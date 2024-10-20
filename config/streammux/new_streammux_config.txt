@@ -1,0 +1,15 @@
+[property]
+max-fps-control = 1
+overall-max-fps-n = 60
+overall-min-fps-n = 5
+max-same-source-frames = 60
+overall-max-fps-d = 1
+
+[source-config-0]
+max-fps-n = 60
+max-fps-d = 1
+
+[source-config-1]
+max-fps-n = 5
+max-fps-d = 1
+
