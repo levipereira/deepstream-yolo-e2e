@@ -3,38 +3,65 @@ import os
 import urllib.request
 
 # URLs of files to download
+base_url = "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/"
+
 urls = {
-    "yolov10": [
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10n-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10s-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10m-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10b-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10l-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov10x-trt.onnx",
+    "coco-labels": ["coco_labels.txt"],
+    "person": [
+        "yolov8n-person-trt.onnx",
+        "person_labels.txt"
     ],
-    "yolov8_detection": [
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8n-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8s-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8m-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8l-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8x-trt.onnx",
+    "football": [
+        "yolov8m-football-trt.onnx",
+        "yolov8n-football-trt.onnx",
+        "football_labels.txt"
     ],
-    "yolov8_segmentation": [
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8n-seg-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8s-seg-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8m-seg-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8l-seg-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov8x-seg-trt.onnx",
+    "face": [
+        "yolov8l-face-trt.onnx",
+        "yolov8m-face-trt.onnx",
+        "yolov8n-face-trt.onnx",
+        "face_labels.txt"
     ],
-    "yolov9_detection": [
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-t-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-s-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-m-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-c-trt.onnx",
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-e-trt.onnx",
+    "drone": [
+        "yolov8m-drone-trt.onnx",
+        "yolov8n-drone-trt.onnx",
+        "drone_labels.txt"
     ],
-    "yolov9_segmentation": [
-        "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9-c-seg-trt.onnx"
+    "parking": [
+        "yolov8m-parking-trt.onnx",
+        "parking_labels.txt"
+    ],
+    "coco-yolov10": [
+        "yolov10n-trt.onnx",
+        "yolov10s-trt.onnx",
+        "yolov10m-trt.onnx",
+        "yolov10b-trt.onnx",
+        "yolov10l-trt.onnx",
+        "yolov10x-trt.onnx"
+    ],
+    "coco-yolov8_detection": [
+        "yolov8n-trt.onnx",
+        "yolov8s-trt.onnx",
+        "yolov8m-trt.onnx",
+        "yolov8l-trt.onnx",
+        "yolov8x-trt.onnx"
+    ],
+    "coco-yolov8_segmentation": [
+        "yolov8n-seg-trt.onnx",
+        "yolov8s-seg-trt.onnx",
+        "yolov8m-seg-trt.onnx",
+        "yolov8l-seg-trt.onnx",
+        "yolov8x-seg-trt.onnx"
+    ],
+    "coco-yolov9_detection": [
+        "yolov9-t-trt.onnx",
+        "yolov9-s-trt.onnx",
+        "yolov9-m-trt.onnx",
+        "yolov9-c-trt.onnx",
+        "yolov9-e-trt.onnx"
+    ],
+    "coco-yolov9_segmentation": [
+        "yolov9-c-seg-trt.onnx"
     ]
 }
 
@@ -43,8 +70,9 @@ destination = "./"
 
 # Function to download files
 def download_files(file_urls):
-    for url in file_urls:
-        filename = os.path.join(destination, os.path.basename(url))
+    for file_name in file_urls:
+        url = f"{base_url}{file_name}"
+        filename = os.path.join(destination, os.path.basename(file_name))
         print(f"\n\nDownloading: {filename}...")
         try:
             urllib.request.urlretrieve(url, filename)
@@ -53,150 +81,136 @@ def download_files(file_urls):
             print(f"Error downloading {filename}: {e}")
 
 def main():
-    print("Choose the model:")
-    print("1. YOLOv10")
-    print("2. YOLOv8")
-    print("3. YOLOv9")
+    print("Choose the model type:")
+    print("1. COCO-YOLOv10")
+    print("2. COCO-YOLOv8")
+    print("3. COCO-YOLOv9")
+    print("4. Person Models")
+    print("5. Football Models")
+    print("6. Face Models")
+    print("7. Drone Models")
+    print("8. Parking Models")
 
-    choice = input("Enter 1, 2, or 3: ")
+    choice = input("Enter a number from 1 to 8: ")
 
     if choice == "1":
-        print("You chose YOLOv10.")
-        print("Choose the download option:")
-        print("1. Download all models")
-        print("2. Choose a specific model to download")
-
-        download_choice = input("Enter 1 or 2: ")
-
-        if download_choice == "1":
-            download_files(urls["yolov10"])
-        elif download_choice == "2":
-            print("Choose the specific model:")
-            models = ["yolov10n", "yolov10s", "yolov10m", "yolov10b", "yolov10l", "yolov10x"]
-            for i, model in enumerate(models):
-                print(f"{i + 1}. {model}")
-            model_choice = int(input("Enter the number of the model you want to download: ")) - 1
-            if 0 <= model_choice < len(models):
-                download_files([urls["yolov10"][model_choice]])
-            else:
-                print("Invalid choice. Exiting the program.")
-        else:
-            print("Invalid choice. Exiting the program.")
+        print("You chose COCO-YOLOv10.")
+        download_yolov10()
 
     elif choice == "2":
-        print("You chose YOLOv8.")
-        print("Choose the type:")
-        print("1. Detection")
-        print("2. Segmentation")
-
-        yolov8_choice = input("Enter 1 or 2: ")
-
-        if yolov8_choice == "1":
-            print("You chose Detection.")
-            print("Choose the download option:")
-            print("1. Download all detection models")
-            print("2. Choose a specific detection model to download")
-
-            download_choice = input("Enter 1 or 2: ")
-
-            if download_choice == "1":
-                download_files(urls["yolov8_detection"])
-            elif download_choice == "2":
-                print("Choose the specific model:")
-                models = ["yolov8n", "yolov8s", "yolov8m", "yolov8l", "yolov8x"]
-                for i, model in enumerate(models):
-                    print(f"{i + 1}. {model}")
-                model_choice = int(input("Enter the number of the model you want to download: ")) - 1
-                if 0 <= model_choice < len(models):
-                    download_files([urls["yolov8_detection"][model_choice]])
-                else:
-                    print("Invalid choice. Exiting the program.")
-            else:
-                print("Invalid choice. Exiting the program.")
-
-        elif yolov8_choice == "2":
-            print("You chose Segmentation.")
-            print("Choose the download option:")
-            print("1. Download all segmentation models")
-            print("2. Choose a specific segmentation model to download")
-
-            download_choice = input("Enter 1 or 2: ")
-
-            if download_choice == "1":
-                download_files(urls["yolov8_segmentation"])
-            elif download_choice == "2":
-                print("Choose the specific model:")
-                models = ["yolov8n-seg", "yolov8s-seg", "yolov8m-seg", "yolov8l-seg", "yolov8x-seg"]
-                for i, model in enumerate(models):
-                    print(f"{i + 1}. {model}")
-                model_choice = int(input("Enter the number of the model you want to download: ")) - 1
-                if 0 <= model_choice < len(models):
-                    download_files([urls["yolov8_segmentation"][model_choice]])
-                else:
-                    print("Invalid choice. Exiting the program.")
-            else:
-                print("Invalid choice. Exiting the program.")
-
-        else:
-            print("Invalid choice. Exiting the program.")
+        print("You chose COCO-YOLOv8.")
+        download_yolov8()
 
     elif choice == "3":
-        print("You chose YOLOv9.")
-        print("Choose the type:")
-        print("1. Detection")
-        print("2. Segmentation")
+        print("You chose COCO-YOLOv9.")
+        download_yolov9()
 
-        yolov9_choice = input("Enter 1 or 2: ")
+    elif choice == "4":
+        print("You chose Person Models.")
+        download_model("person")
 
-        if yolov9_choice == "1":
-            print("You chose Detection.")
-            print("Choose the download option:")
-            print("1. Download all detection models")
-            print("2. Choose a specific detection model to download")
+    elif choice == "5":
+        print("You chose Football Models.")
+        download_model("football")
 
-            download_choice = input("Enter 1 or 2: ")
+    elif choice == "6":
+        print("You chose Face Models.")
+        download_model("face")
 
-            if download_choice == "1":
-                download_files(urls["yolov9_detection"])
-            elif download_choice == "2":
-                print("Choose the specific model:")
-                models = ["yolov9-t", "yolov9-s", "yolov9-m", "yolov9-c", "yolov9-e"]
-                for i, model in enumerate(models):
-                    print(f"{i + 1}. {model}")
-                model_choice = int(input("Enter the number of the model you want to download: ")) - 1
-                if 0 <= model_choice < len(models):
-                    download_files([urls["yolov9_detection"][model_choice]])
-                else:
-                    print("Invalid choice. Exiting the program.")
-            else:
-                print("Invalid choice. Exiting the program.")
+    elif choice == "7":
+        print("You chose Drone Models.")
+        download_model("drone")
 
-        elif yolov9_choice == "2":
-            print("You chose Segmentation.")
-            print("Choose the download option:")
-            print("1. Download all segmentation models")
-            print("2. Choose a specific segmentation model to download")
+    elif choice == "8":
+        print("You chose Parking Models.")
+        download_model("parking")
 
-            download_choice = input("Enter 1 or 2: ")
+    else:
+        print("Invalid choice. Exiting the program.")
 
-            if download_choice == "1":
-                download_files(urls["yolov9_segmentation"])
-            elif download_choice == "2":
-                print("Choose the specific model:")
-                models = ["yolov9-c-seg"]
-                for i, model in enumerate(models):
-                    print(f"{i + 1}. {model}")
-                model_choice = int(input("Enter the number of the model you want to download: ")) - 1
-                if 0 <= model_choice < len(models):
-                    download_files([urls["yolov9_segmentation"][model_choice]])
-                else:
-                    print("Invalid choice. Exiting the program.")
-            else:
-                print("Invalid choice. Exiting the program.")
+def download_yolov10():
+    print("Choose the download option:")
+    print("1. Download all models")
+    print("2. Choose a specific model to download")
 
-        else:
-            print("Invalid choice. Exiting the program.")
+    download_choice = input("Enter 1 or 2: ")
 
+    if download_choice == "1":
+        download_files(urls["coco-yolov10"])
+    elif download_choice == "2":
+        select_specific_model("coco-yolov10", ["yolov10n", "yolov10s", "yolov10m", "yolov10b", "yolov10l", "yolov10x"])
+    else:
+        print("Invalid choice. Exiting the program.")
+
+def download_yolov8():
+    print("Choose the type:")
+    print("1. Detection")
+    print("2. Segmentation")
+
+    yolov8_choice = input("Enter 1 or 2: ")
+
+    if yolov8_choice == "1":
+        print("You chose Detection.")
+        download_model_type("coco-yolov8_detection", ["yolov8n", "yolov8s", "yolov8m", "yolov8l", "yolov8x"])
+    elif yolov8_choice == "2":
+        print("You chose Segmentation.")
+        download_model_type("coco-yolov8_segmentation", ["yolov8n-seg", "yolov8s-seg", "yolov8m-seg", "yolov8l-seg", "yolov8x-seg"])
+    else:
+        print("Invalid choice. Exiting the program.")
+
+def download_yolov9():
+    print("Choose the type:")
+    print("1. Detection")
+    print("2. Segmentation")
+
+    yolov9_choice = input("Enter 1 or 2: ")
+
+    if yolov9_choice == "1":
+        print("You chose Detection.")
+        download_model_type("coco-yolov9_detection", ["yolov9-t", "yolov9-s", "yolov9-m", "yolov9-c", "yolov9-e"])
+    elif yolov9_choice == "2":
+        print("You chose Segmentation.")
+        download_model_type("coco-yolov9_segmentation", ["yolov9-c-seg"])
+    else:
+        print("Invalid choice. Exiting the program.")
+
+def download_model(model_type):
+    print("Choose the download option:")
+    print("1. Download all models")
+    print("2. Choose a specific model to download")
+
+    download_choice = input("Enter 1 or 2: ")
+
+    if download_choice == "1":
+        download_files(urls[model_type])
+    elif download_choice == "2":
+        models = [f for f in urls[model_type] if not f.endswith("labels.txt")]
+        select_specific_model(model_type, models)
+        download_files([urls[model_type][-1]])  # Last item is the labels file
+    else:
+        print("Invalid choice. Exiting the program.")
+
+def download_model_type(model_type, models):
+    print("Choose the download option:")
+    print("1. Download all models")
+    print("2. Choose a specific model to download")
+
+    download_choice = input("Enter 1 or 2: ")
+
+    if download_choice == "1":
+        download_files(urls[model_type])
+    elif download_choice == "2":
+        select_specific_model(model_type, models)
+    else:
+        print("Invalid choice. Exiting the program.")
+
+def select_specific_model(model_type, models):
+    print("Choose the specific model:")
+    for i, model in enumerate(models):
+        print(f"{i + 1}. {model}")
+    model_choice = int(input("Enter the number of the model you want to download: ")) - 1
+    if 0 <= model_choice < len(models):
+        download_files([urls[model_type][model_choice]])
     else:
         print("Invalid choice. Exiting the program.")
 
