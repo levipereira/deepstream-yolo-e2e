@@ -202,7 +202,7 @@ cd /apps/deepstream-yolo-e2e
 ./deepstream.py
 ```
 
-### ⚠️ Important Tip
+### 🚀 Important Tip 🚀
 
 The model with the highest performance and accuracy is **YOLOv9-QAT (ReLU)**. This quantized model delivers exceptional results and supports multiple sources, depending on your GPU capabilities.
 
