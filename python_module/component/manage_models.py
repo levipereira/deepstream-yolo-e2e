@@ -139,7 +139,7 @@ def choose_model():
             continue
 
         # Show model types based on dataset
-        model_types = ["Detection", "Segmentation"] if dataset == "COCO" else ["detection"]
+        model_types = ["Detection", "Segmentation"] if dataset == "COCO" else ["Detection"]
         display_table(model_types, "Choose Model Type:")
         model_type_choice = input("Enter your choice (or '0' to go back): ")
         if model_type_choice == '0':
