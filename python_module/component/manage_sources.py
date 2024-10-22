@@ -167,6 +167,35 @@ def list_media():
     
     print(table)
 
+def list_active_media():
+    print("\nActive Media Sources:")
+    table = PrettyTable()
+    table.field_names = ["Media Name", "Media Type", "URL", "Status"]
+    
+    # Set alignment: left-align columns
+    table.align["Media Name"] = "l"  # Left align media name
+    table.align["Media Type"] = "l"  # Left align media type
+    table.align["URL"] = "l"  # Left align URL
+    table.align["Status"] = "l"  # Left align status
+    
+    active_found = False  # Flag to check if any active media is found
+
+    for count, section in enumerate(config.sections(), start=1):
+        status = "Enabled" if config[section]['enable'] == '1' else "Disabled"
+        
+        # Only add the row if the media is enabled
+        if status == "Enabled":
+            active_found = True
+            media_name = sanitize_input(config[section]['media_name'])
+            media_type = config[section]['type']
+            url = config[section]['url']
+            table.add_row([media_name, media_type, url, status])
+    
+    if active_found:
+        print(table)
+    else:
+        print("No active media sources found.")
+        
 def activate_media():
     print("\nInactive Media Sources:")
     inactive_medias = [(section, config[section]['media_name']) for section in config.sections() if config[section]['enable'] == '0']

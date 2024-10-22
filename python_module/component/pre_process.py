@@ -2,9 +2,10 @@ import os
 import sys
 import json
 
-from python_module.component.manage_sources import manage_source
+from python_module.component.manage_sources import manage_source, list_active_media
 from python_module.component.manage_models import choose_model
 from python_module.component.onnx_to_trt import process_onnx
+from prettytable import PrettyTable
 
 # Define constants for colors (optional)
 RED = "\033[31m"
@@ -30,16 +31,42 @@ def pre_process():
 
     if previous_config:
         print("Previous configuration found.")
+        list_active_media()
+
+        # Create a PrettyTable to display the model configuration
+        table = PrettyTable()
+        table.field_names = ["Model Type", "Model Name"]
+        table.align["Model Type"] = "l"
+        table.align["Model Name"] = "l"
+        # Add previous configuration values to the table
+        num_sources = previous_config.get("num_sources", 0)
+        model_file = previous_config.get("model_file", "Not Set")
+        label_file = previous_config.get("label_file", "Not Set")
+        model_type = previous_config.get("model_type", "Not Set")
+        
+        # Insert the values into the table
+        if model_type == 'det':
+            model_type_table= 'Detection'
+        if model_type == 'seg':
+            model_type_table= 'Segmentation'
+        base_name = os.path.basename(model_file)
+        model_name, _ = os.path.splitext(base_name)
+        table.add_row([ model_type_table, model_name])
+
+
+        
+        
+        # Print the table
+        print("\nPrevious Model Configuration:")
+        print(table)
+
         use_previous = input("Do you want to keep the previous configuration? (y/n): ").strip().lower()
+
     else:
         use_previous = 'n'  # Force reconfiguration if no previous config
 
     if use_previous == 'y':
         # Use previous configurations
-        num_sources = previous_config.get("num_sources", 0)
-        model_file = previous_config.get("model_file")
-        label_file = previous_config.get("label_file")
-        model_type = previous_config.get("model_type")
         return model_type
     else:
         # User needs to configure
