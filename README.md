@@ -213,36 +213,36 @@ You can find it in the model selection menu:
 <h3>References</h3>
 <ul>
     <li>
-        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLO11</a>: Official repository for the YOLOv11 model, featuring advanced object detection capabilities and enhancements over its predecessors.
+        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLO11</a>: Official repository for the YOLO11 model.
     </li>
     <li>
-        <a href="https://github.com/THU-MIG/yolov10" target="_blank">YOLOv10</a>: The official repository for YOLOv10, which includes improvements in detection accuracy and speed.
+        <a href="https://github.com/THU-MIG/yolov10" target="_blank">YOLOv10</a>: The official repository for YOLOv10.
     </li>
     <li>
-        <a href="https://github.com/WongKinYiu/yolov9" target="_blank">YOLOv9</a>: Access the official YOLOv9 repository, showcasing cutting-edge developments in the YOLO series.
+        <a href="https://github.com/WongKinYiu/yolov9" target="_blank">YOLOv9</a>: Access the official YOLOv9 repository.
     </li>
     <li>
-        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLOv8</a>: Official repository for the YOLOv8 model, known for its robust performance in real-time object detection.
+        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLOv8</a>: Official repository for the YOLOv8 model.
     </li>
     <li>
-        <a href="https://github.com/WongKinYiu/yolov7" target="_blank">YOLOv7</a>: Explore the YOLOv7 repository, which continues to push the boundaries of object detection technologies.
+        <a href="https://github.com/WongKinYiu/yolov7" target="_blank">YOLOv7</a>: Explore the YOLOv7 repository.
     </li>
     <li>
-        <a href="https://github.com/akanametov/yolo-face" target="_blank">YOLO-FACE</a>: Dedicated repository for the YOLO-FACE model, designed for accurate face detection and recognition tasks.
+        <a href="https://github.com/akanametov/yolo-face" target="_blank">YOLO-FACE</a>: Dedicated repository for the YOLO-FACE model.
     </li>
     <li>
-        <a href="https://github.com/levipereira/ultralytics" target="_blank">Export YOLO 11/v10/v8</a>: This repository provides tools for exporting YOLOv11, YOLOv10, and YOLOv8 models for various applications, including End2End setups.
+        <a href="https://github.com/levipereira/ultralytics" target="_blank">Export YOLO 11/v10/v8</a>: This repository for exporting YOLO11, v10, and v8 models with End2End.
     </li>
     <li>
-        <a href="https://github.com/levipereira/yolov9-qat" target="_blank">YOLOv9 QAT</a>: Official repository for quantization-aware training (QAT) of the YOLOv9 model, focusing on performance optimization.
+        <a href="https://github.com/levipereira/yolov9-qat" target="_blank">YOLOv9 QAT</a>: Official repository for quantization-aware training (QAT) of the YOLOv9 model,.
     </li>
     <li>
-        <a href="https://github.com/levipereira/nvdsinfer_yolo" target="_blank">NvDsInferYolo</a>: Explore the official repository for the NvDsInferYolo parsing function, facilitating integration with NVIDIA DeepStream applications.
+        <a href="https://github.com/levipereira/nvdsinfer_yolo" target="_blank">NvDsInferYolo</a>: Explore the official repository for the NvDsInferYolo parsing function.
     </li>
     <li>
-        <a href="https://github.com/levipereira/yolo_e2e" target="_blank">YOLO E2E</a>: This repository focuses on exporting YOLO models with End2End capabilities, streamlining deployment processes.
+        <a href="https://github.com/levipereira/yolo_e2e" target="_blank">YOLO E2E</a>: This repository focuses on exporting YOLO models with End2End capabilities.
     </li>
     <li>
-        <a href="https://github.com/levipereira/TensorRT" target="_blank">TensorRT Plugin EfficientNMSX</a>: Official repository for the EfficientNMSX plugin implemented in TensorRT, enhancing non-maximum suppression performance in object detection pipelines.
+        <a href="https://github.com/levipereira/TensorRT" target="_blank">TensorRT Plugin EfficientNMSX</a>: Official repository for the EfficientNMSX plugin implemented in TensorRT.
     </li>
 </ul>
