@@ -35,6 +35,7 @@ Now, you can integrate **videos directly from YouTube** into your pipeline. 📹
 | 6.1                | ❌        | ❌      |
 
 <div align="justify"> 
+
 > ⚠️ **Note:** On Jetson devices, DeepStream 7.1 is only partially supported. Segmentation models are not yet compatible with this version.
 
 >Note: [DeepStream 7.0 and later is supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
