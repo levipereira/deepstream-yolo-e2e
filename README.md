@@ -208,15 +208,40 @@ The model with the highest performance and accuracy is **YOLOv9-QAT (ReLU)**. Th
 You can find it in the model selection menu:
 - **Coco > Detection > Balanced > YOLOv9 QAT (ReLU)**
 
-### References 
-- [YOLO11](https://github.com/ultralytics/ultralytics): Official repository for the YOLOv11 model.
-- [YOLOv10](https://github.com/THU-MIG/yolov10): Official repository for the YOLOv10 model.
-- [YOLOv9](https://github.com/WongKinYiu/yolov9): Official repository for the YOLOv9 model.
-- [YOLOv8](https://github.com/ultralytics/ultralytics): Official repository for the YOLOv8 model.
-- [YOLOv7](https://github.com/WongKinYiu/yolov7): Official repository for the YOLOv7 model.
-- [YOLO-FACE](https://github.com/akanametov/yolo-face): Official repository for the YOLO-FACE model.
-- [Export YOLO11/v10/v8](https://github.com/levipereira/ultralytics): Official repository for the Export YOLO 11/v10/v8 model with End2End.
-- [YOLOv9 QAT](https://github.com/levipereira/yolov9-qat): Official repository for the Quantize YOLOv9 Model.
-- [NvDsInferYolo](https://github.com/levipereira/nvdsinfer_yolo): Official repository for the NvDsInferYolo parse Function.
-- [YOLO E2E](https://github.com/levipereira/yolo_e2e): Official repository for the export YOLO with End2End.
-- [TensorRT plugin EfficientNMSX](https://github.com/levipereira/TensorRT): Official repository  TensorRT implemented the plugin EfficientNMSX.
+ 
+<h3>References</h3>
+<ul>
+    <li>
+        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLO11</a>: Official repository for the YOLOv11 model, featuring advanced object detection capabilities and enhancements over its predecessors.
+    </li>
+    <li>
+        <a href="https://github.com/THU-MIG/yolov10" target="_blank">YOLOv10</a>: The official repository for YOLOv10, which includes improvements in detection accuracy and speed.
+    </li>
+    <li>
+        <a href="https://github.com/WongKinYiu/yolov9" target="_blank">YOLOv9</a>: Access the official YOLOv9 repository, showcasing cutting-edge developments in the YOLO series.
+    </li>
+    <li>
+        <a href="https://github.com/ultralytics/ultralytics" target="_blank">YOLOv8</a>: Official repository for the YOLOv8 model, known for its robust performance in real-time object detection.
+    </li>
+    <li>
+        <a href="https://github.com/WongKinYiu/yolov7" target="_blank">YOLOv7</a>: Explore the YOLOv7 repository, which continues to push the boundaries of object detection technologies.
+    </li>
+    <li>
+        <a href="https://github.com/akanametov/yolo-face" target="_blank">YOLO-FACE</a>: Dedicated repository for the YOLO-FACE model, designed for accurate face detection and recognition tasks.
+    </li>
+    <li>
+        <a href="https://github.com/levipereira/ultralytics" target="_blank">Export YOLO 11/v10/v8</a>: This repository provides tools for exporting YOLOv11, YOLOv10, and YOLOv8 models for various applications, including End2End setups.
+    </li>
+    <li>
+        <a href="https://github.com/levipereira/yolov9-qat" target="_blank">YOLOv9 QAT</a>: Official repository for quantization-aware training (QAT) of the YOLOv9 model, focusing on performance optimization.
+    </li>
+    <li>
+        <a href="https://github.com/levipereira/nvdsinfer_yolo" target="_blank">NvDsInferYolo</a>: Explore the official repository for the NvDsInferYolo parsing function, facilitating integration with NVIDIA DeepStream applications.
+    </li>
+    <li>
+        <a href="https://github.com/levipereira/yolo_e2e" target="_blank">YOLO E2E</a>: This repository focuses on exporting YOLO models with End2End capabilities, streamlining deployment processes.
+    </li>
+    <li>
+        <a href="https://github.com/levipereira/TensorRT" target="_blank">TensorRT Plugin EfficientNMSX</a>: Official repository for the EfficientNMSX plugin implemented in TensorRT, enhancing non-maximum suppression performance in object detection pipelines.
+    </li>
+</ul>
