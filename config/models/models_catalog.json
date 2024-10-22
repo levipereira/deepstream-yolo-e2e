@@ -17,7 +17,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11n-trt"
+          "model_name": "yolo11n-trt"
         }
       ],
       "Small": [
@@ -35,7 +35,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11s-trt"
+          "model_name": "yolo11s-trt"
         }
       ],
       "Medium": [
@@ -53,7 +53,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11m-trt"
+          "model_name": "yolo11m-trt"
         }
       ],
       "Balanced": [
@@ -85,7 +85,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11l-trt"
+          "model_name": "yolo11l-trt"
         }
       ],
       "Extra-large": [
@@ -103,7 +103,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11x-trt"
+          "model_name": "yolo11x-trt"
         }
       ]
     },
@@ -115,7 +115,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11n-seg-trt"
+          "model_name": "yolo11n-seg-trt"
         }
       ],
       "Small": [
@@ -125,7 +125,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11s-seg-trt"
+          "model_name": "yolo11s-seg-trt"
         }
       ],
       "Medium": [
@@ -135,7 +135,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11m-seg-trt"
+          "model_name": "yolo11m-seg-trt"
         }
       ],
       "Balanced": [
@@ -151,7 +151,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11l-seg-trt"
+          "model_name": "yolo11l-seg-trt"
         }
       ],
       "Extra-large": [
@@ -161,7 +161,7 @@
         },
         {
           "model_arch": "YOLO11",
-          "model_name": "yolov11x-seg-trt"
+          "model_name": "yolo11x-seg-trt"
         }
       ]
     }
