@@ -1,4 +1,10 @@
 
+<div align="center">
+  <p>
+    <a href="https://github.com/levipereira/deepstream-yolo-e2e" target="_blank">
+      <img width="100%" src="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/banner.jpg" alt="DeepStream YOLO  banner"></a>
+  </p>
+  
 # DeepStream / YOLO with End2End Implementation
 
 
