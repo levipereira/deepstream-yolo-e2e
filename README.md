@@ -206,5 +206,23 @@ bash /apps/deepstream-yolo-e2e/one_hit_install.sh
 cd /apps/deepstream-yolo-e2e
 ./deepstream.py
 ```
- 
- 
+
+### ⚠️ Important Tip
+
+The model with the highest performance and accuracy is **YOLOv9-QAT (ReLU)**. This quantized model delivers exceptional results and supports multiple sources, depending on your GPU capabilities.
+
+You can find it in the model selection menu:
+- **Coco > Detection > Balanced > YOLOv9 QAT (ReLU)**
+
+### References 
+- [YOLO11](https://github.com/ultralytics/ultralytics): Official repository for the YOLOv11 model.
+- [YOLOv10](https://github.com/THU-MIG/yolov10): Official repository for the YOLOv10 model.
+- [YOLOv9](https://github.com/WongKinYiu/yolov9): Official repository for the YOLOv9 model.
+- [YOLOv8](https://github.com/ultralytics/ultralytics): Official repository for the YOLOv8 model.
+- [YOLOv7](https://github.com/WongKinYiu/yolov7): Official repository for the YOLOv7 model.
+- [YOLO-FACE](https://github.com/akanametov/yolo-face): Official repository for the YOLO-FACE model.
+- [Export YOLO11/v10/v8](https://github.com/levipereira/ultralytics): Official repository for the Export YOLO 11/v10/v8 model with End2End.
+- [YOLOv9 QAT](https://github.com/levipereira/yolov9-qat): Official repository for the Quantize YOLOv9 Model.
+- [NvDsInferYolo](https://github.com/levipereira/nvdsinfer_yolo): Official repository for the NvDsInferYolo parse Function.
+- [YOLO E2E](https://github.com/levipereira/yolo_e2e): Official repository for the export YOLO with End2End.
+- [TensorRT plugin EfficientNMSX](https://github.com/levipereira/TensorRT): Official repository  TensorRT implemented the plugin EfficientNMSX.
