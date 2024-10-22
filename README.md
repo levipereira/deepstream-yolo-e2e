@@ -4,25 +4,27 @@
     <a href="https://github.com/levipereira/deepstream-yolo-e2e" target="_blank">
       <img width="100%" src="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/banner_yolo_e2e.jpg" alt="DeepStream YOLO  banner"></a>
   </p>
-  
-# DeepStream / YOLO with End2End Implementation
+</div>  
 
+<div align="center">
+
+# DeepStream / YOLO E2E
 
 Implementation of End-to-End YOLO Detection and Segmentation Models for DeepStream
 
 This repository offers an optimized implementation of End-to-End YOLO models for DeepStream, enhancing inference efficiency by integrating Non-Maximum Suppression (NMS) directly into the YOLO models. This approach supports dynamic batch sizes and input sizes, providing seamless adaptability.
-
-### 🌟 New Feature: Python Bindings for Enhanced Application Development
-
-We have introduced **Python bindings** in this version, significantly simplifying the process for users to develop and customize applications according to their specific needs. 🐍 With these bindings, users can easily extend their application's capabilities, making it ideal for rapid prototyping.
+ 
 
 ### 🎥 Special Feature: Direct YouTube Video Integration 
-
+</div>
+<div align="justify"> 
 Now, you can integrate **videos directly from YouTube** into your pipeline. 📹 This feature enables seamless streaming and processing of YouTube videos, providing an expanded range of input sources for real-time analytics and AI-driven insights. 🌐 It’s perfect for scenarios where accessing online video data is essential, opening up new possibilities for multimedia applications. 
 
 > **Note:** This feature is available only in the Python application.
+</div>
+<div align="center"> 
 
-### DeepStream Version Support
+### DeepStream Version Supported
 | DeepStream Version | dGPU/X86 | Jetson |
 |--------------------|----------|--------|
 | 7.1                | ✅        | ⚠️     |
@@ -32,72 +34,18 @@ Now, you can integrate **videos directly from YouTube** into your pipeline. 📹
 | 6.2                | ✅        | ✅      |
 | 6.1                | ❌        | ❌      |
 
+<div align="justify"> 
 > ⚠️ **Note:** On Jetson devices, DeepStream 7.1 is only partially supported. Segmentation models are not yet compatible with this version.
 
 >Note: [DeepStream 7.0 and later is supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
 
-## Supported End2End Models
+</div> 
 
-### Detection Models
-
-| Model    | Feature   | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMS |
-|----------|-----------|:-------------:|:-----------------:|:--------:|:-------------:|
-| YOLOv10  | Detection |       ✅       |         ✅         |     ✅    |   <span style="color:red">❌</span>   |
-| YOLOv9   | Detection |       ✅       |         ✅         |     ✅    |       ✅       |
-| YOLOv8   | Detection |       ✅       |         ✅         | <span style="color:red">❌</span> |       ✅       |
-| YOLOv7   | Detection |       ✅       |         ✅         | <span style="color:red">❌</span> |       ✅       |
-
-### Instance Segmentation Models
-
-| Model    | Feature      | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMSX / RoiAlign |
-|----------|--------------|:-------------:|:-----------------:|:--------:|:-------------------------:|
-| YOLOv9   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
-| YOLOv8   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
-| YOLOv7   | Segmentation |       ✅       |         ✅         | <span style="color:red">❌</span> |            ✅              |
-
-**Dynamic Shapes** - TensorRT enables the creation of network resolutions different from the original exported ONNX.
-
-**Dynamic Batch Size** - Dynamically adjusts the batch size to maximize model performance according to the GPU's.
-
-**NMS-Free** - Models natively implement NMS-Free, available for some YOLOv9 models and all YOLOv10 detection models.
-
-**TensorRT Plugins** - TensorRT `EfficientNMS` plugin for detection models, and `EfficientNMSX / ROIAlign` plugins for segmentation models.
-
-
-### Detection Model Output Layers
-- `num_det`
-- `det_boxes`
-- `det_scores`
-- `det_classes`
-
-
-### Instance Segmentation Model Output Layers
-- `num_det`
-- `det_boxes`
-- `det_scores`
-- `det_classes`
-- `det_masks` 
-
-
-With all models standardized with output layers ensure consistency across all YOLO models, we have streamlined processes in DeepStream using the [nvdsinfer_yolo](https://github.com/levipereira/nvdsinfer_yolo/tree/master) library for post-processing, supporting the entire YOLO series without the need for additional modifications.
-
-## Future Implementations 🚀
-
-### Support for QAT Models
-
-- **Yolov10-QAT** - 🔧 **In Development**
-- **Yolov9-QAT** - ✅ **Ready**   
-- **Yolov8-QAT** - 🔧 **In Development**
-- **Yolov7-QAT** - ✅ **Ready**
-
-**Ready**: Quantization Aware Training is implemented and ready for use, but integration into the current repository is still in progress. Stay tuned for updates!  
-**In Development**: Development is ongoing to add support for models with Quantization Aware Training. Stay tuned for updates!
-
-These future implementations aim to expand the range of models supported by this repository, offering enhanced capabilities for your projects.
+<div align="justify"> 
 
 # Prerequisites
 
-## 1. Nvidia GPU
+## 1. NVIDIA GPU CARD
 Make sure you have an Nvidia GPU installed on your system and that the latest drivers are properly configured. 
 Download and install the GPU drivers from the official Nvidia website:
 [Nvidia Drivers Download](https://www.nvidia.com/en-us/drivers/)
@@ -121,6 +69,61 @@ After installation, verify that the setup is correct by running a GPU-enabled co
 ```bash
 docker run --gpus all nvidia/cuda:12.0-base nvidia-smi
 ```
+
+</div>
+
+
+
+<div align="center"> 
+ 
+## Supported End2End Models
+
+### Models Available
+
+| Dataset | Model    | Feature      | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMS / RoiAlign |
+|---------|----------|--------------|:-------------:|:-----------------:|:--------:|:-------------------------:|
+| COCO    | YOLO11   | Detection    |       ✅       |         ✅         |     <span style="color:red">🚫</span>    |     ✅                   |
+| COCO    | YOLOv10  | Detection    |       ✅       |         ✅         |     ✅    |   <span style="color:red">🚫</span>   |
+| COCO    | YOLOv9   | Detection    |       ✅       |         ✅         |     ✅    |       ✅                 |
+| COCO    | YOLOv8   | Detection    |       ✅       |         ✅         | <span style="color:red">🚫</span> |       ✅                 |
+| COCO    | YOLOv7   | Detection    |       ✅       |         ✅         | <span style="color:red">🚫</span> |       ✅                 |
+| COCO    | YOLO11   | Segmentation |       ✅       |         ✅         |     <span style="color:red">🚫</span>    |     ✅                   |
+| COCO    | YOLOv9   | Segmentation |       ✅       |         ✅         | <span style="color:red">🚫</span> |            ✅            |
+| COCO    | YOLOv8   | Segmentation |       ✅       |         ✅         | <span style="color:red">🚫</span> |            ✅            |
+| COCO    | YOLOv7   | Segmentation |       ✅       |         ✅         | <span style="color:red">🚫</span> |            ✅            |
+| WIDER FACE    | YOLO11   | Detection    |       ✅       |         ✅         |     <span style="color:red">🚫</span>    |     ✅                   |
+| WIDER FACE    | YOLOv10  | Detection    |       ✅       |         ✅         |     ✅    |   <span style="color:red">🚫</span>   |
+| WIDER FACE    | YOLOv8   | Detection    |       ✅       |         ✅         |     ✅    |       ✅                 |
+
+</div>
+
+
+
+<table align="center" border="1" cellpadding="10">
+    <tr>
+        <th colspan="2">Features</th>
+    </tr>
+    <tr>
+        <td><strong>Dynamic Shapes</strong></td>
+        <td>TensorRT enables the creation of network resolutions different from the original exported ONNX.</td>
+    </tr>
+    <tr>
+        <td><strong>Dynamic Batch Size</strong></td>
+        <td>Dynamically adjusts the batch size to maximize model performance according to the number of deepstream sources.</td>
+    </tr>
+    <tr>
+        <td><strong>NMS-Free</strong></td>
+        <td>Models natively implement NMS-Free, available for some YOLOv9 models and all YOLOv10 detection models.</td>
+    </tr>
+    <tr>
+        <td><strong>TensorRT Plugins</strong></td>
+        <td>TensorRT <code>EfficientNMS</code> plugin for detection models, and <code>EfficientNMSX / ROIAlign</code> plugins for segmentation models.</td>
+    </tr>
+</table>
+
+<br>
+ 
+<div align="justify"> 
 
 # Project Workflow 
 
@@ -192,151 +195,16 @@ docker run \
 ```
 
 
-### 3. **Install Deepstream Aditional Plugins**
-```bash
-bash /opt/nvidia/deepstream/deepstream/user_additional_install.sh
-```
-
-### 4. **Install Deepstream Python Binds**
-To install the DeepStream Python bindings, run the following command in your terminal, depending on the version of DeepStream you are using. 
-
-**This step is required only if you plan to use the code in Python.**
-
-#### DeepStream 7.1
-```bash
-/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.2.0
-```
-#### DeepStream 7.0
-```bash
-/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.11
-```
-
-#### DeepStream 6.4
-```bash
-/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.10
-```
-#### DeepStream 6.3
-```bash
-/opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.8
-```
-
-### 5. **Build Parse Function nvdsinfer_yolo used by PGIE**
+### 3. **Install packages**
 ```bash
 cd /apps/deepstream-yolo-e2e
-bash scripts/compile_nvdsinfer_yolo.sh
+bash /apps/deepstream-yolo-e2e/one_hit_install.sh
 ```
-
-### 5. **Optional: Patch libnvinfer_plugin to Add EfficientNMX plugin**
->  Important: This step is **mandatory** if you plan to use segmentation models.
+ 
+### 4. Run DeepStream Application
 ```bash
-cd /apps/deepstream-yolo-e2e/TensorRTPlugin
-bash ./patch_libnvinfer.sh
-```
-
-### 7. **Install `yt-dlp` and `ffmpeg` for YouTube Stream Support**
-To enable YouTube streaming support in your Python applications, you need to install `yt-dlp` and `ffmpeg`
-
-```bash
-apt-get install ffmpeg  -y
-pip3 install yt-dlp
-```
-
-### 8. **Download YOLO models**
-```
-cd /apps/deepstream-yolo-e2e/models
-./download_models.py
-```
-
-### 9. **Convert Models ONNX to TensorRT**
-This script converts an ONNX file to a TensorRT engine. 
->**Note** This process may take up to 15 minutes due to the building Engine File with FP16 precision.
-
-```bash
-cd /apps/deepstream-yolo-e2e/
-scripts/onnx_to_trt.sh -f file.onnx [-b batch_size] [-n network_size] [-p precision] [-c config_file] [--force]
-```
-
-- **`-f`**: (Required) Name of the `.onnx` file to be processed.
-- **`-b`**: Batch size. Default is `1`.
-- **`-n`**: Network size. Default is `640`.
-- **`-p`**: Precision. Options are `fp32`, `fp16`, and `qat`. Default is `fp16`.
-- **`-c`**: Configuration PGIE file to update.
-- **`--force`**: Force re-generation of the engine file if it already exists.
-
-> **Note**: The PGIE configuration file (flag `-c`) must be `config_pgie_yolo_det.txt` for detection models and `config_pgie_yolo_seg.txt` for segmentation models.
-
-```
 cd /apps/deepstream-yolo-e2e
-bash scripts/onnx_to_trt.sh -f models/yolov10n-trt.onnx -c config/pgie/config_pgie_yolo_det.txt 
+./deepstream.py
 ```
-
-```
-cd /apps/deepstream-yolo-e2e
-bash scripts/onnx_to_trt.sh -f models/yolov10n-seg-trt.onnx -c config/pgie/config_pgie_yolo_seg.txt 
-```
-
-
-### 10. Run DeepStream Application
-
-#### 10.1 Run DeepStream Python Application
-To run the DeepStream Python application for detection and segmentation, navigate to the `python_apps` directory and execute the following commands:
-
-For more detailed information, please refer to the [`python_apps`](python_apps).
-
-#### Configure Media Source
-To configure your media settings, please edit the file located at `python_apps/config/media.ini`. In this file, you can select the media source from the following options:
-
-- **File**: Specify a local media file.
-- **RTSP**: Stream video from an RTSP source.
-- **YouTube**: Integrate directly with YouTube videos.
-
-#### Detection
-```bash
-cd /apps/deepstream-yolo-e2e/python_apps
-./main.py --output display --model-type det
-```
-#### Segmentation
-
-```bash
-cd /apps/deepstream-yolo-e2e/python_apps
-./main.py --output display --model-type seg
-```
-
-#### 10.2 DeepStream Reference Application
-You can run the DeepStream reference application for both detection and segmentation tasks using the following commands:
-
-#### Detection
-```bash
-cd /apps/deepstream-yolo-e2e/
-deepstream-app -c config/deepstream_app/deepstream_yolo_det.txt
-```
-
-#### Segmentation
-```bash
-cd /apps/deepstream-yolo-e2e/
-deepstream-app -c config/deepstream_app/deepstream_yolov9_mask.txt
-```
-
-
-### Video Processed with DeepStream 7.0 and YOLOv9-Segmentation
-[![YOLOv9 Segmentation](https://img.youtube.com/vi/v6OTjOFLNLA/0.jpg)](https://www.youtube.com/watch?v=v6OTjOFLNLA)
-
-
-# How to Use Custom YOLO Models in This Project
-After training your model, you need to export the model to the ONNX format by implementing the final layers of the model using End2End. <br>
-The procedure is detailed in the [YOLO End2End](https://github.com/levipereira/yolo_e2e/)
-
-Additionally, you must update the [`labels.txt`](labels.txt) file and modify the number of classes in the configuration file, either [`config_pgie_yolo_det.txt`](https://github.com/levipereira/deepstream-yolo-e2e/blob/c9f318b0182cc5d4591e15134ef7caf5a8cbddb9/config_pgie_yolo_det.txt#L13).txt or [`config_pgie_yolo_seg.txt`](https://github.com/levipereira/deepstream-yolo-e2e/blob/c9f318b0182cc5d4591e15134ef7caf5a8cbddb9/config_pgie_yolo_seg.txt#L13).
-
-
-## Using EfficientNMSX Plugin for Segmentation Models
-
-Segmentation models in this project depend on the EfficientNMSX plugin, which is only available in my [TensorRT repository](https://github.com/levipereira/TensorRT). If users prefer not to use the precompiled `libnvinfer_plugin.so` from this repository, they have the option to clone the forked repository and build `libnvinfer_plugin.so` themselves.
-
-To build the plugin:
-
-1. Clone the forked repository containing the EfficientNMSX plugin.
-2. Follow the build instructions provided in the repository to compile `libnvinfer_plugin.so`.
-3. Ensure that the compiled plugin is correctly integrated into your project environment.
-
-This approach allows users flexibility in choosing whether to use the precompiled plugin or build it from the source, depending on their specific requirements and preferences.
+ 
+ 
