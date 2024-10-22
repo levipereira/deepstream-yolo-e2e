@@ -76,9 +76,7 @@ docker run --gpus all nvidia/cuda:12.0-base nvidia-smi
 
 <div align="center"> 
  
-## Supported End2End Models
-
-### Models Available
+#### Models Available
 
 | Dataset | Model    | Feature      | Dynamic Shape | Dynamic Batch Size | NMS-Free | Efficient NMS / RoiAlign |
 |---------|----------|--------------|:-------------:|:-----------------:|:--------:|:-------------------------:|
@@ -139,11 +137,7 @@ git submodule update --init --recursive
 ### 2. **Run Deepstream Container**
 In this example, we will use **DeepStream 7.1**.
 
-```bash
-docker pull nvcr.io/nvidia/deepstream:7.1-triton-multiarch
-```
 Start the docker container from `deepstream-yolo-e2e` dir:
-
 #### 2.1 Windows WSL
 ```bash
 docker run \
