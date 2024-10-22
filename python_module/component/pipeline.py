@@ -1,3 +1,14 @@
+"""
+Creative Commons Attribution-NonCommercial 4.0 International License
+
+You are free to share and adapt the material under the following terms:
+- Attribution: Give appropriate credit.
+- NonCommercial: Not for commercial use without permission.
+
+For inquiries: levi.pereira@gmail.com
+Repository: DeepStream / YOLO (https://github.com/levipereira/deepstream-yolo-e2e)
+License: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+"""
 
 import sys
 import os
@@ -8,15 +19,17 @@ import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst,GLib
 
-from common.FPS import PERF_DATA
-from component.source_factory import create_source_bin , parse_media_source
-from component.rtsp_server import create_rtsp_server
-from component.probes import sink_pad_buffer_probe
-from common.bus_call import bus_call
-import subprocess
+from python_module.common.FPS import PERF_DATA
+from python_module.component.source_factory import create_source_bin , parse_media_source
+from python_module.component.rtsp_server import create_rtsp_server
+from python_module.component.probes import sink_pad_buffer_probe
+from python_module.component.pre_process import pre_process
+from python_module.common.bus_call import bus_call
+
+
 
 config = configparser.ConfigParser()
-config.read('config/config.ini')
+config.read('config/python_app/config.ini')
 
 MUXER_BATCH_TIMEOUT_USEC = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
 MUXER_OUTPUT_WIDTH = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
@@ -28,14 +41,16 @@ OSD_PROCESS_MODE = config.getint('Settings', 'OSD_PROCESS_MODE')
 OSD_DISPLAY_TEXT = config.getint('Settings', 'OSD_DISPLAY_TEXT')
 RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
 
+
+
 # Function to create the pipeline
-def create_pipeline(args):
+def create_pipeline(args, model_type):
     Gst.init(None)
     stream_output=args.output.upper()
-    model_type = args.model_type
+
     
     output_file_path=None
-    media_sources = parse_media_source('config/media.ini')
+    media_sources = parse_media_source('config/python_app/media.ini')
 
     number_sources = len(media_sources)
     if number_sources == 0:
@@ -137,7 +152,6 @@ def create_pipeline(args):
 
                 if not os.path.exists(output_directory):
                     os.makedirs(output_directory)
-                print(output_file_path)
 
                 elements["sink"].set_property('location', output_file_path)
                 elements["sink"].set_property('sync', 0)
@@ -204,10 +218,11 @@ def create_pipeline(args):
 
 # Function to run the pipeline
 def run_pipeline(args):
+    model_type = pre_process()
     if args.output == "rtsp":
         create_rtsp_server()
 
-    pipeline, element_probe, perf_data, output_file_path  = create_pipeline(args)
+    pipeline, element_probe, perf_data, output_file_path  = create_pipeline(args, model_type)
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
         return

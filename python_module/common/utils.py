@@ -17,15 +17,31 @@
 
 import ctypes
 import sys
+import os
+
 sys.path.append('/opt/nvidia/deepstream/deepstream/lib')
+
+# ANSI escape codes for colors
+RED = "\033[91m"  # Red for error messages
+YELLOW = "\033[93m"  # Yellow for warning messages
+RESET = "\033[0m"  # Reset color
+GREEN = "\033[92m"  # Green for success messages
+
 
 def long_to_uint64(l):
     value = ctypes.c_uint64(l & 0xffffffffffffffff).value
     return value
 
+def clear_screen():
+    os.system('clear')
 
-
-
-
-        
- 
+       
+def display_message(msg_type="d", message=None):
+    if msg_type == "e":  # Error
+        print(f"{RED}Error: {message}{RESET}")
+    elif msg_type == "w":  # Warning
+        print(f"{YELLOW}Warning: {message}{RESET}")
+    elif msg_type == "s":  # Success
+        print(f"{GREEN}Success: {message}{RESET}")
+    else:
+        print(message)  # Default case without color

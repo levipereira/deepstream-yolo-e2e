@@ -1,9 +1,21 @@
+"""
+Creative Commons Attribution-NonCommercial 4.0 International License
+
+You are free to share and adapt the material under the following terms:
+- Attribution: Give appropriate credit.
+- NonCommercial: Not for commercial use without permission.
+
+For inquiries: levi.pereira@gmail.com
+Repository: DeepStream / YOLO (https://github.com/levipereira/deepstream-yolo-e2e)
+License: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+"""
+
 import sys
 import gi
 import os
 import configparser
 import subprocess
-from component.yt_factory import get_yt_uri
+from python_module.component.yt_factory import get_yt_uri
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst

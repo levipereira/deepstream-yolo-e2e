@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Creative Commons Attribution-NonCommercial 4.0 International License
+# 
+# You are free to share and adapt the material under the following terms:
+# - Attribution: Give appropriate credit.
+# - NonCommercial: Not for commercial use without permission.
+# 
+# For inquiries: levi.pereira@gmail.com
+# Repository: DeepStream / YOLO (https://github.com/levipereira/deepstream-yolo-e2e)
+# License: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
 # Default values
 batch_size=1
 network_size=640
