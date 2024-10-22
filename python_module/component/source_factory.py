@@ -3,7 +3,7 @@ import gi
 import os
 import configparser
 import subprocess
-from component.yt_factory import get_yt_uri
+from python_module.component.yt_factory import get_yt_uri
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst

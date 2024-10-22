@@ -1,7 +1,6 @@
-#!/usr/bin/python3
 import sys
 import argparse
-from component.pipeline import run_pipeline
+from python_module.component.pipeline import run_pipeline
 
 def parse_args():
 

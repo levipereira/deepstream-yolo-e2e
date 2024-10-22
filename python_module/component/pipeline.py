@@ -8,15 +8,15 @@ import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst,GLib
 
-from common.FPS import PERF_DATA
-from component.source_factory import create_source_bin , parse_media_source
-from component.rtsp_server import create_rtsp_server
-from component.probes import sink_pad_buffer_probe
-from common.bus_call import bus_call
+from python_module.common.FPS import PERF_DATA
+from python_module.component.source_factory import create_source_bin , parse_media_source
+from python_module.component.rtsp_server import create_rtsp_server
+from python_module.component.probes import sink_pad_buffer_probe
+from python_module.common.bus_call import bus_call
 import subprocess
 
 config = configparser.ConfigParser()
-config.read('config/config.ini')
+config.read('python_module/config/config.ini')
 
 MUXER_BATCH_TIMEOUT_USEC = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
 MUXER_OUTPUT_WIDTH = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
@@ -35,7 +35,7 @@ def create_pipeline(args):
     model_type = args.model_type
     
     output_file_path=None
-    media_sources = parse_media_source('config/media.ini')
+    media_sources = parse_media_source('python_module/config/media.ini')
 
     number_sources = len(media_sources)
     if number_sources == 0:
