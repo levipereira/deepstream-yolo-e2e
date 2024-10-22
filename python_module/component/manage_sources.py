@@ -9,7 +9,7 @@ YELLOW = "\033[93m"  # Yellow for warning messages
 RESET = "\033[0m"  # Reset color
 
 # Load the config.ini file
-config_file = "python_module/config/media.ini"
+config_file = "config/python_app/media.ini"
 config = configparser.ConfigParser()
 
 if os.path.exists(config_file):
@@ -277,3 +277,5 @@ def manage_source():
             break
         else:
             display_error("Invalid option selected.")
+    num_active_sources = sum(1 for section in config.sections() if config[section]['enable'] == '1')
+    return num_active_sources

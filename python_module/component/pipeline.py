@@ -13,10 +13,14 @@ from python_module.component.source_factory import create_source_bin , parse_med
 from python_module.component.rtsp_server import create_rtsp_server
 from python_module.component.probes import sink_pad_buffer_probe
 from python_module.common.bus_call import bus_call
-import subprocess
+
+from python_module.component.manage_sources import manage_source
+from python_module.component.manage_models import choose_model
+from python_module.component.onnx_to_trt import process_onnx
+
 
 config = configparser.ConfigParser()
-config.read('python_module/config/config.ini')
+config.read('config/python_app/config.ini')
 
 MUXER_BATCH_TIMEOUT_USEC = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
 MUXER_OUTPUT_WIDTH = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
@@ -28,6 +32,13 @@ OSD_PROCESS_MODE = config.getint('Settings', 'OSD_PROCESS_MODE')
 OSD_DISPLAY_TEXT = config.getint('Settings', 'OSD_DISPLAY_TEXT')
 RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
 
+
+# ANSI escape codes for colors
+RED = "\033[91m"  # Red for error messages
+YELLOW = "\033[93m"  # Yellow for warning messages
+RESET = "\033[0m"  # Reset color
+
+
 # Function to create the pipeline
 def create_pipeline(args):
     Gst.init(None)
@@ -35,7 +46,7 @@ def create_pipeline(args):
     model_type = args.model_type
     
     output_file_path=None
-    media_sources = parse_media_source('python_module/config/media.ini')
+    media_sources = parse_media_source('config/python_app/media.ini')
 
     number_sources = len(media_sources)
     if number_sources == 0:
@@ -201,9 +212,35 @@ def create_pipeline(args):
 
     return pipeline , element_probe, perf_data, output_file_path
 
+def pre_process():
+    num_sources = manage_source()
+    if num_sources < 1:
+        sys.stderr.write(f"{RED}No active media sources were found. Please add or activate a media source before proceeding.{RESET}\n")
+
+    model_file, label_file, model_type = choose_model()
+    if model_type == "Detection":
+        config_file='config/deepstream_app/deepstream_yolo_det.txt'
+    if model_type == "Segmentation":
+        config_file='config/deepstream_app/deepstream_yolo_seg.txt'
+    if 'qat' in model_file:
+        precision = 'qat'
+    else:
+        precision = 'fp16'
+
+    process_onnx(
+        file=model_file,
+        label_file=label_file,
+        batch_size=num_sources,
+        network_size=640,
+        precision=precision,
+        config_file=config_file,
+        force=False
+    )
+ 
 
 # Function to run the pipeline
 def run_pipeline(args):
+    pre_process()
     if args.output == "rtsp":
         create_rtsp_server()
 

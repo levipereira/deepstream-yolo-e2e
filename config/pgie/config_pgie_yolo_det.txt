@@ -2,10 +2,10 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=/apps/deepstream-yolo-e2e/models/yolov9c-qat-trt.onnx
-model-engine-file=/apps/deepstream-yolo-e2e/models/yolov9c-qat-trt-qat-netsize-640-batch-8.engine
-labelfile-path=/apps/deepstream-yolo-e2e/models/yolov9c-qat-trt.txt
-batch-size=8
+onnx-file=/apps/deepstream-yolo-e2e/models/onnx/yolov8n-trt.onnx
+model-engine-file=/apps/deepstream-yolo-e2e/models/onnx/yolov8n-trt-fp16-netsize-640-batch-4.engine
+labelfile-path=/apps/deepstream-yolo-e2e/models/onnx/yolov8n-trt.txt
+batch-size=4
 infer-dims=3;640;640
 force-implicit-batch-dim=0
 # 0: FP32 1: INT8 2: FP16

@@ -4,9 +4,9 @@ import sys
 import requests
 from prettytable import PrettyTable
 
-MODEL_ASSET = '/apps/deepstream-yolo-e2e/models/config/models_asset.json'
-MODEL_CATALOG = '/apps/deepstream-yolo-e2e/models/config/models_catalog.json'
-MODEL_ONNX_DIR = '/apps/deepstream-yolo-e2e/models/onnx/'
+MODEL_ASSET = 'config/models/models_asset.json'
+MODEL_CATALOG = 'config/models/models_catalog.json'
+MODEL_ONNX_DIR = 'models/onnx/'
 
 # Load model structure from the JSON file
 def load_models():
@@ -92,7 +92,8 @@ def display_table(data, title):
     print(f"\n{title}")
     print(table)
 
-def choose_model(models):
+def choose_model():
+    models = load_models()
     while True:
         # Show datasets with descriptions
         dataset_data = [(dataset, models[dataset]["Description"]) for dataset in models.keys()]
@@ -126,7 +127,7 @@ def choose_model(models):
             continue
 
         # Show model types based on dataset
-        model_types = ["Detection", "Segmentation"] if dataset == "COCO" else ["Detection"]
+        model_types = ["Detection", "Segmentation"] if dataset == "COCO" else ["detection"]
         display_table(model_types, "Choose Model Type:")
         model_type_choice = input("Enter your choice (or '0' to go back): ")
         if model_type_choice == '0':
@@ -195,10 +196,8 @@ def choose_model(models):
             print("Invalid choice, please try again.")
 
 if __name__ == "__main__":
-    models = load_models()
     
-    if models:
-        model_file, label_file, model_type = choose_model(models)
-        print(f"Model File: {model_file}")
-        print(f"Label File: {label_file}")
-        print(f"Model Type: {model_type}")
+    model_file, label_file, model_type = choose_model()
+    print(f"Model File: {model_file}")
+    print(f"Label File: {label_file}")
+    print(f"Model Type: {model_type}")

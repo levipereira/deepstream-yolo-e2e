@@ -7,13 +7,6 @@ def parse_args():
     parser = argparse.ArgumentParser(prog="pipeline_yolo.py",
                     description="pipeline_yolo multi stream, multi model inference reference app")
     parser.add_argument(
-        "-mt",
-        "--model-type",
-        required=True,
-        help="Detection Model or Segmentation Model",
-        choices=["det", "seg"],
-    )
-    parser.add_argument(
         "-o",
         "--output",
         required=True,

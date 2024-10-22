@@ -4,7 +4,7 @@ gi.require_version("GstRtspServer", "1.0")
 from gi.repository import GstRtspServer, GstRtsp
 
 config = configparser.ConfigParser()
-config.read('python_module/config/config.ini')
+config.read('config/python_app/config.ini')
 
 
 RTSP_PORT = config.getint('Settings', 'RTSP_PORT')
