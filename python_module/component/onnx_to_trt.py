@@ -23,13 +23,14 @@ def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp
         return
 
     # Set precision flags
-    precision_flags = ""
+    precision_flags = []
     if precision == "fp32":
-        precision_flags = ""
+        # No flags for fp32
+        pass
     elif precision == "fp16":
-        precision_flags = "--fp16"
+        precision_flags.append("--fp16")
     elif precision == "qat":
-        precision_flags = "--fp16 --int8"
+        precision_flags.extend(["--fp16", "--int8"])  # Add both flags for QAT
     else:
         print(f"Error: Invalid precision. Use fp32, fp16, or qat.")
         return
@@ -52,18 +53,18 @@ def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp
     else:
         # Run trtexec with the provided options
         command = [
-            "trtexec",
-            f"--onnx={file}",
-            precision_flags,
-            f"--saveEngine={engine_filepath}",
-            f"--timingCacheFile={engine_timing_filepath}",
-            "--warmUp=500",
-            "--duration=10",
-            "--useCudaGraph",
-            f"--minShapes=images:1x3x{network_size}x{network_size}",
-            f"--optShapes=images:{batch_size}x3x{network_size}x{network_size}",
-            f"--maxShapes=images:{batch_size}x3x{network_size}x{network_size}"
-        ]
+                    "trtexec",
+                    f"--onnx={file}",
+                    ] + precision_flags + [  # Include precision flags as separate elements
+                    f"--saveEngine={engine_filepath}",
+                    f"--timingCacheFile={engine_timing_filepath}",
+                    "--warmUp=500",
+                    "--duration=10",
+                    "--useCudaGraph",
+                    f"--minShapes=images:1x3x{network_size}x{network_size}",
+                    f"--optShapes=images:{batch_size}x3x{network_size}x{network_size}",
+                    f"--maxShapes=images:{batch_size}x3x{network_size}x{network_size}"
+                ]
 
         # Run the command
         try:
