@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Creative Commons Attribution-NonCommercial 4.0 International License
 
