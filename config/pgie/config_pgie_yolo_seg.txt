@@ -2,10 +2,10 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-onnx-file=/apps/deepstream-yolo-e2e/models/onnx/yolo11s-seg-trt.onnx
-model-engine-file=/apps/deepstream-yolo-e2e/models/engine/yolo11s-seg-trt-fp16-netsize-640-batch-4.engine
-labelfile-path=/apps/deepstream-yolo-e2e/models/onnx/yolo11s-seg-trt.txt
-batch-size=4
+onnx-file=/apps/deepstream-yolo-e2e/models/onnx/yolo11n-seg-trt.onnx
+model-engine-file=/apps/deepstream-yolo-e2e/models/engine/yolo11n-seg-trt-fp16-netsize-640-batch-1.engine
+labelfile-path=/apps/deepstream-yolo-e2e/models/onnx/yolo11n-seg-trt.txt
+batch-size=1
 force-implicit-batch-dim=0
 infer-dims=3;640;640
 # 0: FP32 1: INT8 2: FP16

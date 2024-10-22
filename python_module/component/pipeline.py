@@ -42,11 +42,6 @@ OSD_DISPLAY_TEXT = config.getint('Settings', 'OSD_DISPLAY_TEXT')
 RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
 
 
-# ANSI escape codes for colors
-RED = "\033[91m"  # Red for error messages
-YELLOW = "\033[93m"  # Yellow for warning messages
-RESET = "\033[0m"  # Reset color
-
 
 # Function to create the pipeline
 def create_pipeline(args, model_type):
@@ -157,7 +152,6 @@ def create_pipeline(args, model_type):
 
                 if not os.path.exists(output_directory):
                     os.makedirs(output_directory)
-                print(output_file_path)
 
                 elements["sink"].set_property('location', output_file_path)
                 elements["sink"].set_property('sync', 0)

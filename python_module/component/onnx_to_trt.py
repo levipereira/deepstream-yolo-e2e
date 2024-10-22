@@ -13,7 +13,7 @@ License: https://creativecommons.org/licenses/by-nc/4.0/legalcode
 import os
 import subprocess
 import argparse
-
+import re
 MODEL_ENGINE_DIR = '/apps/deepstream-yolo-e2e/models/engine/'
 
 # Function to count non-empty lines in the label file
@@ -28,7 +28,7 @@ def count_labels(label_file):
         return len(labels)
 
 # Function to process the ONNX file and generate TensorRT engine
-def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp16", config_file=None, force=False):
+def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp16", pgie_config_file=None, force=False):
     # Check if the file exists
     if not os.path.isfile(file):
         print(f"Error: The file '{file}' does not exist.")
@@ -59,7 +59,17 @@ def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp
     # Generate full paths for the engine and timing cache files in the MODEL_ENGINE_DIR
     engine_filepath = os.path.join(MODEL_ENGINE_DIR, engine_filename)
     engine_timing_filepath = os.path.join(MODEL_ENGINE_DIR, engine_timing_filename)
+    existing_engines = [
+        f for f in os.listdir(MODEL_ENGINE_DIR)
+        if re.match(rf"{filename}-{precision}-netsize-{network_size}-batch-(\d+)\.engine", f)
+    ]
+    
+    for engine in existing_engines:
+        existing_batch_size = int(re.search(r"-batch-(\d+)\.engine", engine).group(1))
 
+        if existing_batch_size >= batch_size:
+            engine_filepath = os.path.join(MODEL_ENGINE_DIR, engine)
+            break
     if os.path.isfile(engine_filepath) and not force:
         print(f"Warning: The engine file '{engine_filepath}' already exists and will be reused. Use --force to rebuild.")
     else:
@@ -89,16 +99,16 @@ def process_onnx(file, label_file, batch_size=1, network_size=640, precision="fp
     num_detected_classes = count_labels(label_file)
 
     # Update configuration file if provided
-    if config_file:
+    if pgie_config_file:
         file_abs_path = os.path.abspath(file)
         engine_abs_path = os.path.abspath(engine_filepath)
         label_file_abs_path = os.path.abspath(label_file)
-        update_config_file(config_file, file_abs_path, engine_abs_path, label_file_abs_path, num_detected_classes, batch_size, network_size)
+        update_config_file(pgie_config_file, file_abs_path, engine_abs_path, label_file_abs_path, num_detected_classes, batch_size, network_size)
 
 # Function to update the configuration file
-def update_config_file(config_file, onnx_file, engine_file, label_file, num_detected_classes, batch_size, network_size):
-    if os.path.isfile(config_file):
-        with open(config_file, 'r') as file:
+def update_config_file(pgie_config_file, onnx_file, engine_file, label_file, num_detected_classes, batch_size, network_size):
+    if os.path.isfile(pgie_config_file):
+        with open(pgie_config_file, 'r') as file:
             lines = file.readlines()
 
         onnx_file_line = f"onnx-file={onnx_file}\n"
@@ -125,12 +135,12 @@ def update_config_file(config_file, onnx_file, engine_file, label_file, num_dete
             else:
                 updated_lines.append(line)
 
-        with open(config_file, 'w') as file:
+        with open(pgie_config_file, 'w') as file:
             file.writelines(updated_lines)
 
-        print(f"Configuration file '{config_file}' updated.")
+        print(f"PGIE Configuration file '{pgie_config_file}' updated.")
     else:
-        print(f"Error: Configuration file '{config_file}' does not exist.")
+        print(f"Error: PGIE Configuration file '{pgie_config_file}' does not exist.")
 
 # Main function to handle command-line arguments
 def main():

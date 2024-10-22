@@ -14,15 +14,15 @@ import os
 import sys
 import json
 
-from python_module.component.manage_sources import manage_source, list_active_media
+from python_module.component.manage_sources import manage_source, list_active_media, get_active_sources
 from python_module.component.manage_models import choose_model
 from python_module.component.onnx_to_trt import process_onnx
 from prettytable import PrettyTable
+from python_module.common.utils import display_message
+
 
 # Define constants for colors (optional)
-RED = "\033[31m"
-RESET = "\033[0m"
-
+ 
 CONFIG_FILE = 'config/python_app/save_session.json'
 
 def load_config():
@@ -37,64 +37,87 @@ def save_config(config):
     with open(CONFIG_FILE, 'w') as file:
         json.dump(config, file)
 
+def prompt_user(question, default='n'):
+    """Prompt the user with a question and handle default input."""
+    options = f"[Enter to continue or m to modify]" if default == 'n' else "[m to modify or Enter to continue]"
+    response = input(f"{question} {options}: ").strip().lower()
+    if response == '':  # If the user just presses Enter, return the default value
+        return default
+    return response
+
 def pre_process():
     # Load previous configuration if it exists
     previous_config = load_config()
 
     if previous_config:
-        print("Previous configuration found.")
-        list_active_media()
+        display_message("d","Previous configuration found.")
+        is_media_active = list_active_media()
+        
+        # Ask if the user wants to modify the media source, default is 'n' (continue without modification)
+        if is_media_active:
+            modify_media = prompt_user("Do you want to modify the media source?", default='n')
 
+            if modify_media == 'm':
+                manage_source()
+                while get_active_sources() < 1:
+                    manage_source()
+                    if get_active_sources() < 1:
+                        display_message("w", f"No active media sources were found. \nPlease add or activate a media source before proceeding.\n")
+            else:
+                num_sources = previous_config.get("num_sources", 0)
+        else:
+            manage_source()
+            while get_active_sources() < 1:
+                manage_source()
+                if get_active_sources() < 1:
+                    display_message("w", f"No active media sources were found. \nPlease add or activate a media source before proceeding.\n")
+
+        # Ask if the user wants to modify the model, default is 'n' (continue without modification)
         # Create a PrettyTable to display the model configuration
         table = PrettyTable()
         table.field_names = ["Model Type", "Model Name"]
         table.align["Model Type"] = "l"
         table.align["Model Name"] = "l"
+
         # Add previous configuration values to the table
         num_sources = previous_config.get("num_sources", 0)
         model_file = previous_config.get("model_file", "Not Set")
         label_file = previous_config.get("label_file", "Not Set")
         model_type = previous_config.get("model_type", "Not Set")
-        
-        # Insert the values into the table
-        if model_type == 'det':
-            model_type_table= 'Detection'
-        if model_type == 'seg':
-            model_type_table= 'Segmentation'
+
+        # Define model type for table display
+        model_type_table = 'Detection' if model_type == 'det' else 'Segmentation'
+
+        # Extract model name
         base_name = os.path.basename(model_file)
         model_name, _ = os.path.splitext(base_name)
-        table.add_row([ model_type_table, model_name])
+        table.add_row([model_type_table, model_name])
 
-
-        
-        
         # Print the table
-        print("\nPrevious Model Configuration:")
-        print(table)
+        display_message("d","\nPrevious Model Configuration:")
+        display_message("d",table)
 
-        use_previous = input("Do you want to keep the previous configuration? (y/n): ").strip().lower()
+        # Ask if the user wants to modify the model, default is 'n' (continue without modification)
+        modify_model = prompt_user("Do you want to modify the model?", default='n')
+        if modify_model == 'm':
+            model_file, label_file, model_type = choose_model()
 
     else:
-        use_previous = 'n'  # Force reconfiguration if no previous config
-
-    if use_previous == 'y':
-        # Use previous configurations
-        return model_type
-    else:
-        # User needs to configure
-        num_sources = manage_source()
-        if num_sources < 1:
-            sys.stderr.write(f"{RED}No active media sources were found. Please add or activate a media source before proceeding.{RESET}\n")
-            return model_type
+        display_message("w","No previous configuration found. Please configure now.")
+        manage_source()
+        while get_active_sources() < 1:
+            manage_source()
+            if get_active_sources() < 1:
+                display_message("w", f"No active media sources were found. \nPlease add or activate a media source before proceeding.\n")
 
         model_file, label_file, model_type = choose_model()
 
     # Determine model type and configuration file based on user choice
-    if model_type == "Detection":
-        config_file = 'config/pgie/config_pgie_yolo_det.txt'
+    if model_type in ("Detection", "det"):
+        pgie_config_file = 'config/pgie/config_pgie_yolo_det.txt'
         model_type = "det"
-    elif model_type == "Segmentation":
-        config_file = 'config/pgie/config_pgie_yolo_seg.txt'
+    elif model_type in  ("Segmentation","seg"):
+        pgie_config_file = 'config/pgie/config_pgie_yolo_seg.txt'
         model_type = "seg"
 
     # Determine precision based on the model file name
@@ -102,23 +125,24 @@ def pre_process():
     
     # Save current configurations
     current_config = {
-        "num_sources": num_sources,
+        "num_sources": get_active_sources(),
         "model_file": model_file,
         "label_file": label_file,
         "model_type": model_type,
         "precision": precision,
     }
     save_config(current_config)
-    print("Configuration saved.")
-    
+    display_message("s","Configuration saved.")
+
+    # Process the ONNX model
     process_onnx(
         file=model_file,
         label_file=label_file,
-        batch_size=num_sources,
+        batch_size=get_active_sources(),
         network_size=640,
         precision=precision,
-        config_file=config_file,
+        pgie_config_file=pgie_config_file,
         force=False
     )
+
     return model_type
- 

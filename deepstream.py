@@ -51,6 +51,9 @@ def get_user_choice():
                 print("Invalid choice. Please select a number between 1 and 4.")
         except ValueError:
             print("Invalid input. Please enter a valid number.")
+        except KeyboardInterrupt:
+            print("\nInput interrupted. Exiting application.")
+            sys.exit(0)
 
 def parse_args():
     parser = argparse.ArgumentParser(prog="pipeline_yolo.py",
@@ -78,5 +81,9 @@ def parse_args():
 
 if __name__ == '__main__':
     clear_screen()
-    args = parse_args()
-    sys.exit(run_pipeline(args))
+    try:
+        args = parse_args()
+        sys.exit(run_pipeline(args))
+    except KeyboardInterrupt:
+        print("\nApplication terminated by user.")
+        sys.exit(0)
