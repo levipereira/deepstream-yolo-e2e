@@ -1,1 +1,0 @@
-{"num_sources": 4, "model_file": "models/onnx/yolov9c-relu-qat-trt.onnx", "label_file": "models/onnx/yolov9c-relu-qat-trt.txt", "model_type": "det", "precision": "qat"}

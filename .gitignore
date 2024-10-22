@@ -54,3 +54,4 @@ pnnx*
 # calibration image
 calibration_*.npy
 models/onnx/
+config/python_app/save_session.json
