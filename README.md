@@ -210,6 +210,36 @@ You can find it in the model selection menu:
 - **Coco > Detection > Balanced > YOLOv9 QAT (ReLU)**
 
  
+## General Configuration Settings
+The application can be configured using the config/config.init file. Below are the key settings you can modify:
+
+
+### Configuration Parameters
+
+- **MUXER_OUTPUT_WIDTH and MUXER_OUTPUT_HEIGHT**: These parameters define the dimensions (width and height) of the output video stream produced by the muxer.
+
+- **TILED_OUTPUT_WIDTH and TILED_OUTPUT_HEIGHT**: These parameters specify the dimensions of the tiled output format.  
+
+- **OUTPUT_DIRECTORY**: This is the directory where output files will be saved.
+ 
+- **OUTPUT_PREFIX**: This parameter specifies the prefix for the output file names.
+
+- **RTSP_PORT**: This is the port used for the RTSP stream. The default value is `8554`.
+
+- **RTSP_FACTORY**: This represents the path for the RTSP stream. For example, setting it to `/live` allows for streaming under this path.
+
+- **RTSP_UDPSYNC**: This is the internal port used by DeepStream to connect to the RTSP server. The default value is 8255.
+
+**RTSP URL Format** <br>When constructing the RTSP URL, it will always follow this format:
+```
+rtsp://<server_ip>:<RTSP_PORT><RTSP_FACTORY>
+```
+For example, if you use the default settings, the URL would be:
+
+```bash
+rtsp://<server_ip>:8554/live
+```
+ 
 <h3>References</h3>
 <ul>
     <li>
