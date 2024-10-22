@@ -211,7 +211,7 @@ You can find it in the model selection menu:
 
  
 ## General Configuration Settings
-The application can be configured using the config/config.init file. Below are the key settings you can modify:
+The application can be configured using the [`config/python_app/config.ini`](config/python_app/config.ini) file. Below are the key settings you can modify:
 
 
 ### Configuration Parameters
