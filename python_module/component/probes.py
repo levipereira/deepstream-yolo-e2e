@@ -25,8 +25,6 @@ MetaObject = namedtuple(
     ["left", "top", "height", "width", "area", "bottom", "id", "text", "class_id"],
 )
 
-
-
 # Function for probe to extract metadata
 def sink_pad_buffer_probe(pad, info, u_data, perf_data):
     frame_number = 0
