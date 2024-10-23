@@ -178,7 +178,7 @@ def osd_sink_pad_buffer_probe(pad, info, u_data, dynamic_labels ):
  
 
             for j, idx in enumerate(range(start_idx, end_idx)):
-                class_id = meta_list_sorted[idx]['class_id']
+                class_id = meta_list_sorted[idx].class_id
                 color = dynamic_labels.get(class_id)
                 red = color.red
                 green = color.green

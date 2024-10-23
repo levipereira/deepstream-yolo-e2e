@@ -123,7 +123,7 @@ def create_pipeline(args, model_type):
     elements["tracker"].set_property('tracker-width', 640)
     elements["tracker"].set_property('tracker-height', 384)
     elements["tracker"].set_property('ll-lib-file', '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
-    elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_accuracy.yml')
+    elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml')
     elements["tracker"].set_property('display-tracking-id', 1)
 
     if stream_output == "SILENT":
@@ -197,17 +197,16 @@ def create_pipeline(args, model_type):
 
 
     elements["streammux"].link(elements["pgie"])
+    elements["pgie"].link(elements["tracker"])
 
     if stream_output == "SILENT":
-        element_probe = elements["pgie"]
-        elements["pgie"].link(elements["sink"])
+        element_probe = elements["tracker"]
+        elements["tracker"].link(elements["sink"])
 
     if stream_output in ("FILE", "RTSP", "DISPLAY"):
         element_probe = elements["nvtiler"]
-        
-        elements["pgie"].link(elements["tracker"])
         elements["tracker"].link(elements["nvvidconv_tiler"])
-        elements["nvvidconv_tiler"].link(elements["nvvidconv_tiler"])
+        elements["nvvidconv_tiler"].link(elements["filter_tiler"])
         elements["filter_tiler"].link(elements["nvtiler"])
         elements["nvtiler"].link(elements["nvosd"])
         if stream_output in ("FILE", "RTSP"):
