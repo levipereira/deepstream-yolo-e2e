@@ -69,7 +69,7 @@ def create_pipeline(args, model_type):
         "streammux": ("nvstreammux", "stream-muxer"),
         "pgie": ("nvinfer", "primary-inference"),
     }
- 
+    elements["tracker"] = ("nvtracker", "tracker")
     if stream_output == "SILENT":
         elements["sink"] = ("fakesink", "fakesink")
 
@@ -115,6 +115,12 @@ def create_pipeline(args, model_type):
     else:
         sys.stderr.write(f"Model Type not supported {model_type}\n")
         exit
+
+    elements["tracker"].set_property('tracker-width', 640)
+    elements["tracker"].set_property('tracker-height', 384)
+    elements["tracker"].set_property('ll-lib-file', '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
+    elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_accuracy.yml')
+    elements["tracker"].set_property('display-tracking-id', 1)
 
     if stream_output == "SILENT":
         elements["sink"].set_property('enable-last-sample', 0)
@@ -194,8 +200,10 @@ def create_pipeline(args, model_type):
 
     if stream_output in ("FILE", "RTSP", "DISPLAY"):
         element_probe = elements["nvtiler"]
-        elements["pgie"].link(elements["nvvidconv_tiler"])
-        elements["nvvidconv_tiler"].link(elements["filter_tiler"])
+        
+        elements["pgie"].link(elements["tracker"])
+        elements["tracker"].link(elements["nvvidconv_tiler"])
+        elements["nvvidconv_tiler"].link(elements["nvvidconv_tiler"])
         elements["filter_tiler"].link(elements["nvtiler"])
         elements["nvtiler"].link(elements["nvosd"])
         if stream_output in ("FILE", "RTSP"):
