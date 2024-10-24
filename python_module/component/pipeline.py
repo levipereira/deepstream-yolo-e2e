@@ -22,9 +22,10 @@ from gi.repository import Gst,GLib
 from python_module.common.FPS import PERF_DATA
 from python_module.component.source_factory import create_source_bin , parse_media_source
 from python_module.component.rtsp_server import create_rtsp_server
-from python_module.component.probes import sink_pad_buffer_probe
+from python_module.component.probes import sink_pad_buffer_probe, osd_sink_pad_buffer_probe
 from python_module.component.pre_process import pre_process
 from python_module.common.bus_call import bus_call
+from python_module.common.utils import create_dynamic_labels
 
 
 
@@ -69,7 +70,7 @@ def create_pipeline(args, model_type):
         "streammux": ("nvstreammux", "stream-muxer"),
         "pgie": ("nvinfer", "primary-inference"),
     }
- 
+    elements["tracker"] = ("nvtracker", "tracker")
     if stream_output == "SILENT":
         elements["sink"] = ("fakesink", "fakesink")
 
@@ -109,12 +110,21 @@ def create_pipeline(args, model_type):
     elements["streammux"].set_property('batch-size', number_sources)
 
     if model_type == 'det':
-        elements["pgie"].set_property('config-file-path', "/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt")
+        pgie_conf_file="/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_det.txt"
     elif model_type == 'seg':
-        elements["pgie"].set_property('config-file-path', "/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_seg.txt")
+        pgie_conf_file="/apps/deepstream-yolo-e2e/config/pgie/config_pgie_yolo_seg.txt"
     else:
         sys.stderr.write(f"Model Type not supported {model_type}\n")
         exit
+    
+    elements["pgie"].set_property('config-file-path', pgie_conf_file )
+
+
+    elements["tracker"].set_property('tracker-width', 640)
+    elements["tracker"].set_property('tracker-height', 384)
+    elements["tracker"].set_property('ll-lib-file', '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
+    elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml')
+    elements["tracker"].set_property('display-tracking-id', 0)
 
     if stream_output == "SILENT":
         elements["sink"].set_property('enable-last-sample', 0)
@@ -187,14 +197,15 @@ def create_pipeline(args, model_type):
 
 
     elements["streammux"].link(elements["pgie"])
+    elements["pgie"].link(elements["tracker"])
 
     if stream_output == "SILENT":
-        element_probe = elements["pgie"]
-        elements["pgie"].link(elements["sink"])
+        element_probe = elements["tracker"]
+        elements["tracker"].link(elements["sink"])
 
     if stream_output in ("FILE", "RTSP", "DISPLAY"):
         element_probe = elements["nvtiler"]
-        elements["pgie"].link(elements["nvvidconv_tiler"])
+        elements["tracker"].link(elements["nvvidconv_tiler"])
         elements["nvvidconv_tiler"].link(elements["filter_tiler"])
         elements["filter_tiler"].link(elements["nvtiler"])
         elements["nvtiler"].link(elements["nvosd"])
@@ -212,8 +223,10 @@ def create_pipeline(args, model_type):
         
         else:
             elements["nvosd"].link(elements["sink"])
+    
+    dynamic_labels = create_dynamic_labels(pgie_conf_file)
 
-    return pipeline , element_probe, perf_data, output_file_path
+    return pipeline , element_probe, perf_data, output_file_path, dynamic_labels , number_sources
 
 
 # Function to run the pipeline
@@ -222,7 +235,7 @@ def run_pipeline(args):
     if args.output == "rtsp":
         create_rtsp_server()
 
-    pipeline, element_probe, perf_data, output_file_path  = create_pipeline(args, model_type)
+    pipeline, element_probe, perf_data, output_file_path, dynamic_labels, number_sources  = create_pipeline(args, model_type)
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
         return
@@ -237,6 +250,13 @@ def run_pipeline(args):
         sys.stderr.write("Unable to get sink pad of nvosd\n")
         return
     elementsinkpad.add_probe(Gst.PadProbeType.BUFFER, sink_pad_buffer_probe, 0, perf_data)
+    
+    osd = element_probe.get_static_pad("sink")
+    if not osd:
+        sys.stderr.write("Unable to get sink pad of nvosd\n")
+        return
+    osd.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0, dynamic_labels, number_sources)
+
     GLib.timeout_add(5000, perf_data.perf_print_callback)
 
     print("Starting pipeline \n")

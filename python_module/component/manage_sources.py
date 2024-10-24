@@ -207,7 +207,7 @@ def list_active_media():
     else:
         display_message("w","No active media sources found.")
         return False
-        
+
 def activate_media():
     display_message("d","\nInactive Media Sources:")
     inactive_medias = [(section, config[section]['media_name']) for section in config.sections() if config[section]['enable'] == '0']
@@ -230,19 +230,43 @@ def activate_media():
     
     display_message("d", table)
     
-    choice = input("Enter the number of the media to activate (or 'c' to cancel): ").strip()
+    choice = input("Enter the numbers of the media to activate (e.g., '1,2,3') or 'c' to cancel: ").strip()
     if choice.lower() == 'c':
         display_message("d","Activation cancelled.")
         return
     
     try:
-        index = int(choice) - 1
-        section, media_name = inactive_medias[index]
-        config[section]['enable'] = '1'
-        display_message("s",f"{media_name} has been activated.")
+        # Convert the user input into a list of indices, handling both single and multiple inputs
+        indices = [int(x.strip()) - 1 for x in choice.split(',') if x.strip().isdigit()]
+        
+        if not indices:
+            raise ValueError("No valid selections.")
+        
+        # Remove duplicates from the input
+        indices = list(set(indices))
+
+        # Check for valid index range
+        invalid_indices = [i for i in indices if i < 0 or i >= len(inactive_medias)]
+        if invalid_indices:
+            raise IndexError(f"Invalid selection(s): {', '.join(map(str, [i + 1 for i in invalid_indices]))}. Please try again.")
+        
+        # Activate the selected media sources
+        activated_medias = []
+        for index in indices:
+            section, media_name = inactive_medias[index]
+            config[section]['enable'] = '1'
+            activated_medias.append(media_name)
+        
+        # Display success message for activated media
+        display_message("s", f"The following media sources have been activated: {', '.join(activated_medias)}.")
         save_config()
-    except (IndexError, ValueError):
-        display_message("e","Invalid choice. Please try again.")
+    
+    except (IndexError, ValueError) as e:
+        display_message("e", str(e))
+        display_message("e", "Invalid input. Please enter valid numbers separated by commas.")
+
+
+
 
 def deactivate_media():
     display_message("d","\nActive Media Sources:")
@@ -266,19 +290,41 @@ def deactivate_media():
     
     display_message("d", table)
     
-    choice = input("Enter the number of the media to deactivate (or 'c' to cancel): ").strip()
+    choice = input("Enter the numbers of the media to deactivate (e.g., '1,2,3') or 'c' to cancel: ").strip()
     if choice.lower() == 'c':
         display_message("d", "Deactivation cancelled.")
         return
     
     try:
-        index = int(choice) - 1
-        section, media_name = active_medias[index]
-        config[section]['enable'] = '0'
-        display_message("d",f"{media_name} has been deactivated.")
+        # Convert the user input into a list of indices, handling both single and multiple inputs
+        indices = [int(x.strip()) - 1 for x in choice.split(',') if x.strip().isdigit()]
+        
+        if not indices:
+            raise ValueError("No valid selections.")
+        
+        # Remove duplicates from the input
+        indices = list(set(indices))
+
+        # Check for valid index range
+        invalid_indices = [i for i in indices if i < 0 or i >= len(active_medias)]
+        if invalid_indices:
+            raise IndexError(f"Invalid selection(s): {', '.join(map(str, [i + 1 for i in invalid_indices]))}. Please try again.")
+        
+        # Deactivate the selected media sources
+        deactivated_medias = []
+        for index in indices:
+            section, media_name = active_medias[index]
+            config[section]['enable'] = '0'
+            deactivated_medias.append(media_name)
+        
+        # Display success message for deactivated media
+        display_message("s", f"The following media sources have been deactivated: {', '.join(deactivated_medias)}.")
         save_config()
-    except (IndexError, ValueError):
-        display_message("e","Invalid choice. Please try again.")
+    
+    except (IndexError, ValueError) as e:
+        display_message("e", str(e))
+        display_message("e", "Invalid input. Please enter valid numbers separated by commas.")
+
 
 def show_menu():
     list_summary()
@@ -290,11 +336,12 @@ def show_menu():
     menu.align["Index"] = "c"  # Center align index
     menu.align["Option"] = "l"  # Left align option
     
-    menu.add_row(["1", "Add Media"])
-    menu.add_row(["2", "Remove Media"])
+    
+    menu.add_row(["1", "Activate Media"])
+    menu.add_row(["2", "Deactivate Media"])
     menu.add_row(["3", "List Media"])
-    menu.add_row(["4", "Deactivate Media"])
-    menu.add_row(["5", "Activate Media"])
+    menu.add_row(["4", "Add Media"])
+    menu.add_row(["5", "Remove Media"])
     menu.add_row(["0", "Finish"])
     
     display_message("d", menu)
@@ -304,19 +351,17 @@ def manage_source():
         show_menu()
         choice = input("Select an option: ").strip()
         if choice == '1':
-            add_media()
+            activate_media()
         elif choice == '2':
-            remove_media()
+            deactivate_media()
         elif choice == '3':
             list_media()
         elif choice == '4':
-            deactivate_media()
+            add_media()
         elif choice == '5':
-            activate_media()
+            remove_media()
         elif choice == '0':
             break
         else:
-            display_message("e","Invalid option selected.")
-
-
+            display_message("e", "Invalid option selected.")
 
