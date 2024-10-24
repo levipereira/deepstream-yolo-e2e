@@ -82,13 +82,13 @@ def create_pipeline(args, model_type):
         if stream_output in ("FILE","RTSP"):
             elements["nvvidconv_encoder"] = ("nvvideoconvert", "nvvidconv_encoder")
             elements["filter_encoder"] = ("capsfilter", "filter_encoder")
-            elements["encoder"] = ("nvv4l2h264enc", "encoder")
-            elements["codeparser"] = ("h264parse", "h264-parser2")
+            elements["encoder"] = ("nvv4l2h265enc", "encoder")
+            elements["codeparser"] = ("h265parse", "h265-parser2")
             if stream_output  == "FILE":
                 elements["container"] = ("matroskamux", "muxer")
                 elements["sink"] = ("filesink", "file-sink")
             if stream_output  == "RTSP":
-                elements["rtppay"] = ("rtph264pay", "rtppay")
+                elements["rtppay"] = ("rtph265pay", "rtppay")
                 elements["sink"] = ("udpsink", "udpsink")
         else:
             elements["sink"] = ("nveglglessink", "nvvideo-renderer")    
@@ -150,8 +150,11 @@ def create_pipeline(args, model_type):
 
         if stream_output in ("FILE", "RTSP"):
             elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
-            elements["encoder"].set_property('bitrate', 4097152)
- 
+            elements["encoder"].set_property('control-rate', 2) 
+            elements["encoder"].set_property('tuning-info-id', 2)  
+            
+            
+              
             if stream_output == "FILE":
                 output_directory = config.get('Settings', 'OUTPUT_DIRECTORY')
                 output_prefix =  config.get('Settings', 'OUTPUT_PREFIX') 
@@ -231,7 +234,7 @@ def create_pipeline(args, model_type):
 
 # Function to run the pipeline
 def run_pipeline(args):
-    model_type = pre_process()
+    model_type = pre_process(args.output)
     if args.output == "rtsp":
         create_rtsp_server()
 

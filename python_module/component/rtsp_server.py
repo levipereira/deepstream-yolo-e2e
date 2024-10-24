@@ -29,7 +29,7 @@ def create_rtsp_server():
     rtsp_port_num = RTSP_PORT
     rtsp_stream_end = RTSP_FACTORY
     updsink_port_num = RTSP_UDPSYNC
-    codec = 'H264'
+    codec = 'H265'
 
     server = GstRtspServer.RTSPServer.new()
     auth = GstRtspServer.RTSPAuth()

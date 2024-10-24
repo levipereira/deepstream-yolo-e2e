@@ -17,8 +17,10 @@ import json
 from python_module.component.manage_sources import manage_source, list_active_media, get_active_sources
 from python_module.component.manage_models import choose_model
 from python_module.component.onnx_to_trt import process_onnx
+from python_module.component.system_config import show_current_resolution, menu_system_resolution
 from prettytable import PrettyTable
 from python_module.common.utils import display_message
+
 
 
 # Define constants for colors (optional)
@@ -45,10 +47,15 @@ def prompt_user(question, default='n'):
         return default
     return response
 
-def pre_process():
+def pre_process(output):
     # Load previous configuration if it exists
-    previous_config = load_config()
+    if output != "silent":
+        show_current_resolution()
+        modify_resolution = prompt_user("Do you want to modify current output resolution?", default='n')
+        if modify_resolution == 'm':
+            menu_system_resolution()
 
+    previous_config = load_config()
     if previous_config:
         display_message("d","Previous configuration found.")
         is_media_active = list_active_media()
