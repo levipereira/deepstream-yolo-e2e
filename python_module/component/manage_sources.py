@@ -336,11 +336,12 @@ def show_menu():
     menu.align["Index"] = "c"  # Center align index
     menu.align["Option"] = "l"  # Left align option
     
-    menu.add_row(["1", "Add Media"])
-    menu.add_row(["2", "Remove Media"])
+    
+    menu.add_row(["1", "Activate Media"])
+    menu.add_row(["2", "Deactivate Media"])
     menu.add_row(["3", "List Media"])
-    menu.add_row(["4", "Deactivate Media"])
-    menu.add_row(["5", "Activate Media"])
+    menu.add_row(["4", "Add Media"])
+    menu.add_row(["5", "Remove Media"])
     menu.add_row(["0", "Finish"])
     
     display_message("d", menu)
@@ -350,19 +351,17 @@ def manage_source():
         show_menu()
         choice = input("Select an option: ").strip()
         if choice == '1':
-            add_media()
+            activate_media()
         elif choice == '2':
-            remove_media()
+            deactivate_media()
         elif choice == '3':
             list_media()
         elif choice == '4':
-            deactivate_media()
+            add_media()
         elif choice == '5':
-            activate_media()
+            remove_media()
         elif choice == '0':
             break
         else:
-            display_message("e","Invalid option selected.")
-
-
+            display_message("e", "Invalid option selected.")
 
