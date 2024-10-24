@@ -124,7 +124,7 @@ def create_pipeline(args, model_type):
     elements["tracker"].set_property('tracker-height', 384)
     elements["tracker"].set_property('ll-lib-file', '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
     elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml')
-    elements["tracker"].set_property('display-tracking-id', 1)
+    elements["tracker"].set_property('display-tracking-id', 0)
 
     if stream_output == "SILENT":
         elements["sink"].set_property('enable-last-sample', 0)
@@ -226,7 +226,7 @@ def create_pipeline(args, model_type):
     
     dynamic_labels = create_dynamic_labels(pgie_conf_file)
 
-    return pipeline , element_probe, perf_data, output_file_path, dynamic_labels
+    return pipeline , element_probe, perf_data, output_file_path, dynamic_labels , number_sources
 
 
 # Function to run the pipeline
@@ -235,7 +235,7 @@ def run_pipeline(args):
     if args.output == "rtsp":
         create_rtsp_server()
 
-    pipeline, element_probe, perf_data, output_file_path, dynamic_labels  = create_pipeline(args, model_type)
+    pipeline, element_probe, perf_data, output_file_path, dynamic_labels, number_sources  = create_pipeline(args, model_type)
     if not pipeline:
         sys.stderr.write("Failed to create pipeline\n")
         return
@@ -255,7 +255,7 @@ def run_pipeline(args):
     if not osd:
         sys.stderr.write("Unable to get sink pad of nvosd\n")
         return
-    osd.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0, dynamic_labels)
+    osd.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0, dynamic_labels, number_sources)
 
     GLib.timeout_add(5000, perf_data.perf_print_callback)
 

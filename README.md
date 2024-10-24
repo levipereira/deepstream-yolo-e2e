@@ -8,17 +8,17 @@
 
 <div align="center">
 
-# DeepStream / YOLO E2E
+### **<span style="color:#76B900;">DEEPSTREAM</span>** & **<span style="color:blueviolet;">YOLO E2E</span>**
 
 Implementation of End-to-End YOLO Detection and Segmentation Models for DeepStream
 
 This repository offers an optimized implementation of End-to-End YOLO models for DeepStream, enhancing inference efficiency by integrating Non-Maximum Suppression (NMS) directly into the YOLO models. This approach supports dynamic batch sizes and input sizes, providing seamless adaptability.
  
 
-### 🎥 Special Feature: Direct YouTube Video Integration 
+### 🎥 Special Feature: Direct **<span style="color:red;">YouTube</span>** Video Video Integration
 </div>
 <div align="justify"> 
-Now, you can integrate **videos directly from YouTube** into your pipeline. 📹 This feature enables seamless streaming and processing of YouTube videos, providing an expanded range of input sources for real-time analytics and AI-driven insights. 🌐 It’s perfect for scenarios where accessing online video data is essential, opening up new possibilities for multimedia applications. 
+Now, you can integrate <strong>videos directly from YouTube</strong> into your pipeline. 📹 This feature enables seamless streaming and processing of YouTube videos, providing an expanded range of input sources for real-time analytics and AI-driven insights. 🌐 It’s perfect for scenarios where accessing online video data is essential, opening up new possibilities for multimedia applications. 
 
 > **Note:** This feature is available only in the Python application.
 </div>

@@ -15,15 +15,23 @@ import gi
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+from collections import defaultdict
 
-from operator import attrgetter
-from collections import namedtuple
+object_trackers = defaultdict(lambda: defaultdict(list))
+last_seen = defaultdict(lambda: defaultdict(int))   
 
+FRAME_EXPIRATION_LIMIT = 60
 
-MetaObject = namedtuple(
-    "MetaObject",
-    ["left", "top", "height", "width", "area", "bottom", "id", "text", "class_id"],
-)
+def purge_old_objects(current_frame_num):
+    for pad_index, objects in list(object_trackers.items()):
+        for object_id in list(objects.keys()):
+            if current_frame_num - last_seen[pad_index][object_id] > FRAME_EXPIRATION_LIMIT:
+                del object_trackers[pad_index][object_id]
+                del last_seen[pad_index][object_id]
+            else:
+                if len(object_trackers[pad_index][object_id]) > 25:
+                    object_trackers[pad_index][object_id] = object_trackers[pad_index][object_id][-25:]
+
 
 # Function for probe to extract metadata
 def sink_pad_buffer_probe(pad, info, u_data, perf_data):
@@ -67,10 +75,7 @@ def sink_pad_buffer_probe(pad, info, u_data, perf_data):
 
     return Gst.PadProbeReturn.OK
 
-
-
-
-def osd_sink_pad_buffer_probe(pad, info, u_data, dynamic_labels ):
+def osd_sink_pad_buffer_probe(pad, info, u_data, dynamic_labels, number_sources):
     frame_number = 0
     num_rects = 0
     gst_buffer = info.get_buffer()
@@ -80,125 +85,111 @@ def osd_sink_pad_buffer_probe(pad, info, u_data, dynamic_labels ):
 
     batch_meta = pyds.gst_buffer_get_nvds_batch_meta(hash(gst_buffer))
     l_frame = batch_meta.frame_meta_list
-    meta_list = []
+    meta_list = []  # Lista temporária para armazenar objetos
 
     while l_frame is not None:
         try:
             frame_meta = pyds.NvDsFrameMeta.cast(l_frame.data)
         except StopIteration:
             break
-
+ 
+        pad_index = frame_meta.pad_index
         frame_number = frame_meta.frame_num
         num_rects = frame_meta.num_obj_meta
         l_obj = frame_meta.obj_meta_list
-
+        display_meta = pyds.nvds_acquire_display_meta_from_pool(batch_meta)
         while l_obj is not None:
             try:
                 obj_meta = pyds.NvDsObjectMeta.cast(l_obj.data)
             except StopIteration:
                 break
 
-            obj = MetaObject(
-                left=obj_meta.tracker_bbox_info.org_bbox_coords.left,
-                top=obj_meta.tracker_bbox_info.org_bbox_coords.top,
-                height=obj_meta.tracker_bbox_info.org_bbox_coords.height,
-                width=obj_meta.tracker_bbox_info.org_bbox_coords.width,
-                area=obj_meta.tracker_bbox_info.org_bbox_coords.height
-                * obj_meta.tracker_bbox_info.org_bbox_coords.width,
-                bottom=obj_meta.tracker_bbox_info.org_bbox_coords.top
-                + obj_meta.tracker_bbox_info.org_bbox_coords.height,
-                id=obj_meta.object_id,
-                text=f"ID: {obj_meta.object_id:04d}, Class: {pyds.get_string(obj_meta.text_params.display_text)}",
-                class_id=obj_meta.class_id,
-            )
-            meta_list.append(obj)
+            object_id = obj_meta.object_id
+            class_id = obj_meta.class_id
+            text = f"{pyds.get_string(obj_meta.text_params.display_text).capitalize()}"
+            color = dynamic_labels.get(class_id)
+            obj_rect = obj_meta.rect_params
+            obj_rect.border_color.set( color.red, color.green, color.blue,  1.0)
+            obj_rect.border_width=1
+            obj_rect.has_bg_color=1
+            obj_rect.bg_color.set( color.red, color.green, color.blue,  0.0)
+            
+            obj_coords = obj_meta.tracker_bbox_info.org_bbox_coords
+            obj_coords_x = int(obj_coords.left)
+            obj_coords_y = int(obj_coords.top)
+            obj_coords_w = int(obj_coords.width)
+            obj_coords_h = int(obj_coords.height)
 
-            obj_meta.text_params.display_text = ""
-            obj_meta.text_params.set_bg_clr = 0
-            obj_meta.rect_params.border_width = 0
+           
+            center_x = obj_coords_x + obj_coords_w // 2
+            center_y = obj_coords_y + obj_coords_h // 2
 
+            botton_center_x = int(obj_coords_x + obj_coords_w / 2)
+            botton_center_y = int(obj_coords_y + obj_coords_h)
+            
+            object_trackers[pad_index][object_id].append((botton_center_x, botton_center_y))
+            last_seen[pad_index][object_id] = frame_number
+            
+            if len(object_trackers[pad_index][object_id]) > 20:
+                object_trackers[pad_index][object_id].pop(0)
+
+            text_x_offset = 10    
+            text_y_offset = 30    
+ 
+
+            text_x = center_x + text_x_offset
+            text_y = center_y - text_y_offset
+
+
+            if text_x < 1:
+                text_x=1
+            if text_y < 1:
+                text_y=1
+
+
+            min_fsize = 6
+            max_fsize = 10
+            if number_sources == 1:
+
+                max_fsize = max(min_fsize, max_fsize)   
+            elif number_sources > 1:
+                max_fsize = max(min_fsize, max_fsize - (number_sources - 1)) 
+
+
+            font_size = min_fsize + (max_fsize - min_fsize) * (obj_coords_h / 100)
+            font_size = max(min_fsize, min(max_fsize, int(font_size)))
+
+            obj_meta.text_params.font_params.font_size = font_size
+            obj_meta.text_params.x_offset = text_x
+            obj_meta.text_params.y_offset  = text_y
+            obj_meta.text_params.display_text = text
+            obj_meta.text_params.set_bg_clr = 1
+            obj_meta.text_params.font_params.font_name = "Serif"
+            obj_meta.text_params.font_params.font_size = font_size
+            obj_meta.text_params.font_params.font_color.set(1.0, 1.0, 1.0, 1.0)
+            obj_meta.text_params.text_bg_clr.set(color.red, color.green, color.blue, 0.5)
+
+
+            trail = object_trackers[pad_index][object_id]
+            for i in range(len(trail) - 1):
+                x1, y1 = trail[i]
+                if x1 > 0 and y1 > 0:
+                    if i % 16 == 0:
+                        pyds.nvds_add_display_meta_to_frame(frame_meta, display_meta)
+                        display_meta = pyds.nvds_acquire_display_meta_from_pool(batch_meta)
+                    display_meta.num_circles = 1 + (i % 16)
+                    py_nvosd_circle_params = display_meta.circle_params[i % 16]
+                    py_nvosd_circle_params.circle_color.set(color.red, color.green, color.blue, 0.9)
+                    py_nvosd_circle_params.radius = 3
+                    py_nvosd_circle_params.xc = x1
+                    py_nvosd_circle_params.yc = y1
+                
             try:
                 l_obj = l_obj.next
             except StopIteration:
                 break
-
-        meta_list_sorted = sorted(meta_list, key=attrgetter("bottom"))
-        max_labels = 10  # Define a suitable number for max_labels
-        num_objects = len(meta_list_sorted)
-        num_meta_objects = (num_objects + max_labels - 1) // max_labels
-
-        # Create a single display_meta for the frame counter and object counts
-        display_meta_main = pyds.nvds_acquire_display_meta_from_pool(batch_meta)
-        display_meta_main.num_labels = 1
-        py_nvosd_text_params = display_meta_main.text_params[0]
-        py_nvosd_text_params.x_offset = 10
-        py_nvosd_text_params.y_offset = 12
-        py_nvosd_text_params.font_params.font_name = "Serif"
-        py_nvosd_text_params.font_params.font_size = 10
-        py_nvosd_text_params.font_params.font_color.set(1.0, 1.0, 1.0, 1.0)
-        py_nvosd_text_params.set_bg_clr = 1
-        py_nvosd_text_params.text_bg_clr.set(0.0, 0.0, 0.0, 1.0)
-        pyds.nvds_add_display_meta_to_frame(frame_meta, display_meta_main)
-
-        for i in range(num_meta_objects):
-            display_meta = pyds.nvds_acquire_display_meta_from_pool(batch_meta)
-            display_meta.num_labels = 0
-
-            start_idx = i * max_labels
-            end_idx = min((i + 1) * max_labels, num_objects)
-
-            for j, idx in enumerate(range(start_idx, end_idx)):
-                x = int(meta_list_sorted[idx].left)
-                y = int(meta_list_sorted[idx].top) - 15
-
-                if x < 0 or y < 0:
-                    continue
-
-                display_meta.text_params[
-                    display_meta.num_labels
-                ].display_text = meta_list_sorted[idx].text
-                display_meta.text_params[display_meta.num_labels].x_offset = x
-                display_meta.text_params[display_meta.num_labels].y_offset = y
-                display_meta.text_params[
-                    display_meta.num_labels
-                ].font_params.font_name = "Serif"
-                display_meta.text_params[
-                    display_meta.num_labels
-                ].font_params.font_size = 10
-                display_meta.text_params[
-                    display_meta.num_labels
-                ].font_params.font_color.set(1.0, 1.0, 1.0, 1.0)
-                display_meta.text_params[display_meta.num_labels].set_bg_clr = 1
-                display_meta.text_params[display_meta.num_labels].text_bg_clr.set(
-                    0.45, 0.20, 0.50, 0.75
-                )
-                display_meta.num_labels += 1
-
-            display_meta.num_rects = end_idx - start_idx
- 
-
-            for j, idx in enumerate(range(start_idx, end_idx)):
-                class_id = meta_list_sorted[idx].class_id
-                color = dynamic_labels.get(class_id)
-                red = color.red
-                green = color.green
-                blue = color.blue
-                alpha = color.alpha
-
-
-                display_meta.rect_params[j].left = meta_list_sorted[idx].left
-                display_meta.rect_params[j].top = meta_list_sorted[idx].top
-                display_meta.rect_params[j].width = meta_list_sorted[idx].width
-                display_meta.rect_params[j].height = meta_list_sorted[idx].height
-                display_meta.rect_params[j].border_width = 2
-                display_meta.rect_params[j].border_color.red = red
-                display_meta.rect_params[j].border_color.green = green
-                display_meta.rect_params[j].border_color.blue = blue
-                display_meta.rect_params[j].border_color.alpha = alpha
-                display_meta.rect_params[j].has_bg_color = 0
-
-            pyds.nvds_add_display_meta_to_frame(frame_meta, display_meta)
-
+        pyds.nvds_add_display_meta_to_frame(frame_meta, display_meta)
+        purge_old_objects(frame_number)
         try:
             l_frame = l_frame.next
         except StopIteration:
