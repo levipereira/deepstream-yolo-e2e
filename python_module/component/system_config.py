@@ -8,6 +8,31 @@ def load_config():
     config.read(config_file)
     return config
 
+def get_config():
+    config = load_config()
+    # Load configuration variables
+    muxer_batch_timeout_usec = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
+    muxer_output_width = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
+    muxer_output_height = config.getint('Settings', 'MUXER_OUTPUT_HEIGHT')
+
+    tiled_output_width = config.getint('Settings', 'TILED_OUTPUT_WIDTH')
+    tiled_output_height = config.getint('Settings', 'TILED_OUTPUT_HEIGHT')
+    osd_process_mode = config.getint('Settings', 'OSD_PROCESS_MODE')
+    osd_display_text = config.getint('Settings', 'OSD_DISPLAY_TEXT')
+    rtsp_udpsync = config.getint('Settings', 'RTSP_UDPSYNC')
+
+    return {
+        'MUXER_BATCH_TIMEOUT_USEC': muxer_batch_timeout_usec,
+        'MUXER_OUTPUT_WIDTH': muxer_output_width,
+        'MUXER_OUTPUT_HEIGHT': muxer_output_height,
+        'TILED_OUTPUT_WIDTH': tiled_output_width,
+        'TILED_OUTPUT_HEIGHT': tiled_output_height,
+        'OSD_PROCESS_MODE': osd_process_mode,
+        'OSD_DISPLAY_TEXT': osd_display_text,
+        'RTSP_UDPSYNC': rtsp_udpsync
+    }
+
+
 def show_current_resolution():
     config = load_config()
     table = PrettyTable()

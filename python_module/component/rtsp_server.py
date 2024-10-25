@@ -14,21 +14,14 @@ import configparser
 import gi
 gi.require_version("GstRtspServer", "1.0")
 from gi.repository import GstRtspServer, GstRtsp
-
-config = configparser.ConfigParser()
-config.read('config/python_app/config.ini')
-
-
-RTSP_PORT = config.getint('Settings', 'RTSP_PORT')
-RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
-RTSP_FACTORY = config.get('Settings', 'RTSP_FACTORY')
- 
+from python_module.component.system_config import get_config
  
 
 def create_rtsp_server():
-    rtsp_port_num = RTSP_PORT
-    rtsp_stream_end = RTSP_FACTORY
-    updsink_port_num = RTSP_UDPSYNC
+    config_values = get_config()
+    rtsp_port_num = config_values['RTSP_PORT']
+    rtsp_stream_end = config_values['RTSP_FACTORY']
+    updsink_port_num = config_values['RTSP_UDPSYNC']
     codec = 'H265'
 
     server = GstRtspServer.RTSPServer.new()
@@ -38,7 +31,7 @@ def create_rtsp_server():
     server.attach(None)
 
     factory = GstRtspServer.RTSPMediaFactory.new()
-    factory.set_protocols(GstRtsp.RTSPLowerTrans.TCP)
+    factory.set_protocols(GstRtsp.RTSPLowerTrans.UDP)
     factory.set_transport_mode(GstRtspServer.RTSPTransportMode.PLAY)
     factory.set_latency(1)
     factory.set_launch(

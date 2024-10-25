@@ -26,21 +26,8 @@ from python_module.component.probes import sink_pad_buffer_probe, osd_sink_pad_b
 from python_module.component.pre_process import pre_process
 from python_module.common.bus_call import bus_call
 from python_module.common.utils import create_dynamic_labels
+from python_module.component.system_config import get_config
 
-
-
-config = configparser.ConfigParser()
-config.read('config/python_app/config.ini')
-
-MUXER_BATCH_TIMEOUT_USEC = config.getint('Settings', 'MUXER_BATCH_TIMEOUT_USEC')
-MUXER_OUTPUT_WIDTH = config.getint('Settings', 'MUXER_OUTPUT_WIDTH')
-MUXER_OUTPUT_HEIGHT = config.getint('Settings', 'MUXER_OUTPUT_HEIGHT')
-
-TILED_OUTPUT_WIDTH = config.getint('Settings', 'TILED_OUTPUT_WIDTH')
-TILED_OUTPUT_HEIGHT = config.getint('Settings', 'TILED_OUTPUT_HEIGHT')
-OSD_PROCESS_MODE = config.getint('Settings', 'OSD_PROCESS_MODE')
-OSD_DISPLAY_TEXT = config.getint('Settings', 'OSD_DISPLAY_TEXT')
-RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
 
 
 
@@ -48,6 +35,7 @@ RTSP_UDPSYNC = config.getint('Settings', 'RTSP_UDPSYNC')
 def create_pipeline(args, model_type):
     Gst.init(None)
     stream_output=args.output.upper()
+    config_values = get_config()
 
     
     output_file_path=None
@@ -104,9 +92,9 @@ def create_pipeline(args, model_type):
 
     ## Configure Elements
     if os.environ.get('USE_NEW_NVSTREAMMUX') != 'yes':
-        elements["streammux"].set_property('width', MUXER_OUTPUT_WIDTH)
-        elements["streammux"].set_property('height', MUXER_OUTPUT_HEIGHT)
-        elements["streammux"].set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
+        elements["streammux"].set_property('width', config_values['MUXER_OUTPUT_WIDTH'])
+        elements["streammux"].set_property('height', config_values['MUXER_OUTPUT_HEIGHT'])
+        elements["streammux"].set_property('batched-push-timeout', config_values['MUXER_BATCH_TIMEOUT_USEC'])
     elements["streammux"].set_property('batch-size', number_sources)
 
     if model_type == 'det':
@@ -136,11 +124,11 @@ def create_pipeline(args, model_type):
         tiler_columns=int(math.ceil((1.0*number_sources)/tiler_rows))
         elements["nvtiler"].set_property("rows",tiler_rows)
         elements["nvtiler"].set_property("columns",tiler_columns)
-        elements["nvtiler"].set_property("width", TILED_OUTPUT_WIDTH)
-        elements["nvtiler"].set_property("height", TILED_OUTPUT_HEIGHT)
+        elements["nvtiler"].set_property("width", config_values['TILED_OUTPUT_WIDTH'])
+        elements["nvtiler"].set_property("height", config_values['TILED_OUTPUT_HEIGHT'])
 
-        elements["nvosd"].set_property('process-mode',OSD_PROCESS_MODE)
-        elements["nvosd"].set_property('display-text',OSD_DISPLAY_TEXT)
+        elements["nvosd"].set_property('process-mode',config_values['OSD_PROCESS_MODE'])
+        elements["nvosd"].set_property('display-text',config_values['OSD_DISPLAY_TEXT'])
         if model_type == 'det':
             elements["nvosd"].set_property('display-bbox', 1)
         if model_type == 'seg':
@@ -171,7 +159,7 @@ def create_pipeline(args, model_type):
             
             if stream_output == "RTSP":
                 elements["sink"].set_property('host', "127.0.0.1")
-                elements["sink"].set_property('port', RTSP_UDPSYNC)
+                elements["sink"].set_property('port', config_values['RTSP_UDPSYNC'])
                 elements["sink"].set_property('async', False)
                 elements["sink"].set_property('sync', 1)
             

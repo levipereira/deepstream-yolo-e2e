@@ -20,6 +20,8 @@ import os
 
 os.environ['GST_DEBUG'] = 'ERROR'  
 
+os.system('stty sane')
+
 def display_output_options():
     """Display available output options to the user in a table format."""
     table = PrettyTable()
@@ -86,5 +88,6 @@ if __name__ == '__main__':
         args = parse_args()
         sys.exit(run_pipeline(args))
     except KeyboardInterrupt:
+        os.system('stty sane')
         print("\nApplication terminated by user.")
         sys.exit(0)

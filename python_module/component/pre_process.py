@@ -49,12 +49,6 @@ def prompt_user(question, default='n'):
 
 def pre_process(output):
     # Load previous configuration if it exists
-    if output != "silent":
-        show_current_resolution()
-        modify_resolution = prompt_user("Do you want to modify current output resolution?", default='n')
-        if modify_resolution == 'm':
-            menu_system_resolution()
-
     previous_config = load_config()
     if previous_config:
         display_message("d","Previous configuration found.")
@@ -70,8 +64,6 @@ def pre_process(output):
                     manage_source()
                     if get_active_sources() < 1:
                         display_message("w", f"No active media sources were found. \nPlease add or activate a media source before proceeding.\n")
-            else:
-                num_sources = previous_config.get("num_sources", 0)
         else:
             manage_source()
             while get_active_sources() < 1:
@@ -151,5 +143,10 @@ def pre_process(output):
         pgie_config_file=pgie_config_file,
         force=False
     )
-
+    if output != "silent":
+        show_current_resolution()
+        modify_resolution = prompt_user("Do you want to modify current output resolution?", default='n')
+        if modify_resolution == 'm':
+            menu_system_resolution()
+            
     return model_type
