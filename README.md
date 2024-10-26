@@ -38,8 +38,6 @@ Now, you can integrate <strong>videos directly from YouTube</strong> into your p
 
 > ⚠️ **Note:** On Jetson devices, DeepStream 7.1 is only partially supported. Segmentation models are not yet compatible with this version.
 
->Note: [DeepStream 7.0 and later is supported on Windows WSL2](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html), which greatly aids in application development.
-
 </div> 
 
 <div align="justify"> 
@@ -51,7 +49,14 @@ Make sure you have an Nvidia GPU installed on your system and that the latest dr
 Download and install the GPU drivers from the official Nvidia website:
 [Nvidia Drivers Download](https://www.nvidia.com/en-us/drivers/)
 
-## 2. Docker
+## 2. Supported OS / Platform
+- **Windows 11**
+  * Enable WSL2 in Windows and install Linux(Ubuntu) from the Microsoft Store.
+  * [DeepStream On WSL](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_on_WSL2.html)
+- **Linux (x86_64)**
+- **NVIDIA Jetson ARM**
+  
+## 3. Docker 
 Docker is required for creating and managing containers, simplifying development and deployment. 
 To install Docker on Ubuntu, use the convenience script:<br>
 [Docker Installation Guide for Ubuntu](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script)
@@ -60,7 +65,7 @@ After the installation, add your user to the docker group to run Docker commands
 ```bash
 sudo usermod -aG docker $USER
 ```
- ## 3. NVIDIA Container Toolkit
+ ## 4. NVIDIA Container Toolkit
 The NVIDIA Container Toolkit allows Docker containers to utilize the Nvidia GPU to accelerate your applications. 
 To install the toolkit, follow the official guide:
 
