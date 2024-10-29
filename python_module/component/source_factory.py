@@ -47,6 +47,7 @@ def cb_newpad(decodebin, decoder_src_pad,data):
             sys.stderr.write(" Error: Decodebin did not pick nvidia decoder plugin.\n")
 
 def decodebin_child_added(child_proxy, Object, name, user_data):
+    platform_info= PlatformInfo()
     print("Decodebin child added:", name, "\n")
     if name.find("decodebin") != -1:
         Object.connect("child-added", decodebin_child_added, user_data)
