@@ -72,7 +72,7 @@ To install the toolkit, follow the official guide:
 
 After installation, verify that the setup is correct by running a GPU-enabled container:
 ```bash
-docker run --gpus all nvidia/cuda:12.0-base nvidia-smi
+docker run --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04  nvidia-smi
 ```
 
 </div>
