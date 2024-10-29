@@ -56,7 +56,8 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
     """Display a spinner, GPU usage, and model details in the terminal. Stops when stop_event is set."""
     
     # Get GPU name
-    gpu_name = get_gpu_name()
+    if not os.path.isfile('/proc/device-tree/model'):
+        gpu_name = get_gpu_name()
     
     # Modify model_name to remove everything after the second dash from the end
     modified_model_name = '-'.join(model_name.split('-')[:-2]) if model_name.count('-') > 1 else model_name
@@ -73,7 +74,8 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
     index = 0
 
     # Fixed layout that doesn't need to be redrawn each time
-    stdscr.addstr(1, 0, f"GPU: {gpu_name}")
+    if not os.path.isfile('/proc/device-tree/model'):
+        stdscr.addstr(1, 0, f"GPU: {gpu_name}")
     stdscr.addstr(3, 0, "Model Information:")
     stdscr.addstr(4, 0, table.get_string())
 
@@ -84,7 +86,9 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
 
     while not stop_event.is_set():  # Check if stop_event is set to terminate the loop
         # Get the GPU usage percentage
-        gpu_usage = get_gpu_usage()
+        gpu_usage = 0
+        if not os.path.isfile('/proc/device-tree/model'):
+            gpu_usage = get_gpu_usage()
 
         # Create a progress bar for GPU usage
         bar_length = 20
@@ -93,7 +97,8 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
         
         # Only update dynamic parts (spinner and GPU usage)
         stdscr.addstr(15, 0, f"Precision Calibration and Layer Fusion in Progress... {spin_chars[index]}")
-        stdscr.addstr(16, 0, f"GPU Usage: [{bar}] {gpu_usage}%")
+        if not os.path.isfile('/proc/device-tree/model'):
+            stdscr.addstr(16, 0, f"GPU Usage: [{bar}] {gpu_usage}%")
         
         # Refresh the screen to update the display
         stdscr.refresh()

@@ -27,7 +27,7 @@ Now, you can integrate <strong>videos directly from YouTube</strong> into your p
 ### DeepStream Version Supported
 | DeepStream Version | dGPU/X86 | Jetson |
 |--------------------|----------|--------|
-| 7.1                | ✅        | ⚠️     |
+| 7.1                | ✅        | ✅     |
 | 7.0                | ✅        | ✅      |
 | 6.4                | ✅        | ✅      |
 | 6.3                | ✅        | ✅      |
@@ -36,7 +36,6 @@ Now, you can integrate <strong>videos directly from YouTube</strong> into your p
 
 <div align="justify"> 
 
-> ⚠️ **Note:** On Jetson devices, DeepStream 7.1 is only partially supported. Segmentation models are not yet compatible with this version.
 
 </div> 
 

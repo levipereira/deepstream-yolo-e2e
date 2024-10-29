@@ -144,8 +144,8 @@ def create_pipeline(args, model_type):
             
               
             if stream_output == "FILE":
-                output_directory = config.get('Settings', 'OUTPUT_DIRECTORY')
-                output_prefix =  config.get('Settings', 'OUTPUT_PREFIX') 
+                output_directory = config_values['OUTPUT_DIRECTORY']   
+                output_prefix =  config_values['OUTPUT_PREFIX']  
 
                 timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
                 output_file_name = f"{output_prefix}_{timestamp}.mp4"

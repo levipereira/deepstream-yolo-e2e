@@ -21,6 +21,11 @@ def get_config():
     osd_display_text = config.getint('Settings', 'OSD_DISPLAY_TEXT')
     rtsp_udpsync = config.getint('Settings', 'RTSP_UDPSYNC')
 
+    rtsp_port = config.getint('Settings', 'RTSP_PORT')  
+    rtsp_factory = config.get('Settings', 'RTSP_FACTORY')  
+    output_directory = config.get('Settings', 'OUTPUT_DIRECTORY')  
+    output_prefix = config.get('Settings', 'OUTPUT_PREFIX')
+
     return {
         'MUXER_BATCH_TIMEOUT_USEC': muxer_batch_timeout_usec,
         'MUXER_OUTPUT_WIDTH': muxer_output_width,
@@ -29,7 +34,11 @@ def get_config():
         'TILED_OUTPUT_HEIGHT': tiled_output_height,
         'OSD_PROCESS_MODE': osd_process_mode,
         'OSD_DISPLAY_TEXT': osd_display_text,
-        'RTSP_UDPSYNC': rtsp_udpsync
+        'RTSP_UDPSYNC': rtsp_udpsync,
+        'RTSP_FACTORY' : rtsp_factory,
+        'RTSP_PORT': rtsp_port,
+        'OUTPUT_DIRECTORY' : output_directory ,
+        'OUTPUT_PREFIX' : output_prefix
     }
 
 

@@ -24,6 +24,7 @@ URLs["libnvinfer_plugin.so.10.3.0.x86_64"]="https://github.com/levipereira/deeps
 URLs["libnvinfer_plugin.so.8.6.1.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.1.aarch64"
 URLs["libnvinfer_plugin.so.8.6.2.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.8.6.2.aarch64"
 URLs["libnvinfer_plugin.so.10.0.1.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.10.0.1.aarch64"
+URLs["libnvinfer_plugin.so.10.3.0.aarch64"]="https://github.com/levipereira/deepstream-yolo-e2e/releases/download/v1.0/libnvinfer_plugin.so.10.3.0.aarch64"
 
 # Function to download and apply the patch
 download_and_patch() {
