@@ -39,6 +39,8 @@ class PlatformInfo:
         self.is_integrated_gpu_verified = False
         self.is_aarch64_platform = False
         self.is_aarch64_verified = False
+        self.is_jetson_nano = False
+        self.is_jetson = False
 
     def is_wsl(self):
         with guard_platform_info:
@@ -82,6 +84,30 @@ class PlatformInfo:
             self.is_aarch64_verified = True
         return self.is_aarch64_platform
 
+    def is_jetson_device(self):
+        """Checks if the device is an NVIDIA Jetson."""
+        if self.is_platform_aarch64():
+            try:
+                with open("/proc/device-tree/model", "r") as file:
+                    model_info = file.read()
+                    self.is_jetson = "NVIDIA Jetson" in model_info
+            except FileNotFoundError:
+                raise RuntimeError("ERROR: /proc/device-tree/model not found. "
+                                   "Run Docker as privileged with the --privileged flag.")
+        return self.is_jetson
+    
+    def is_jetson_nano_device(self):
+        """Checks if the device is specifically a Jetson Nano."""
+        if self.is_jetson_device():
+            try:
+                with open("/proc/device-tree/model", "r") as file:
+                    model_info = file.read()
+                    self.is_jetson_nano = "Orin Nano" in model_info
+            except FileNotFoundError:
+                raise RuntimeError("ERROR: /proc/device-tree/model not found. "
+                                   "Run Docker as privileged with the --privileged flag.")
+        return self.is_jetson_nano
 
 
 sys.path.append('/opt/nvidia/deepstream/deepstream/lib')
+

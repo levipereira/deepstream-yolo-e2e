@@ -15,14 +15,18 @@ import gi
 gi.require_version("GstRtspServer", "1.0")
 from gi.repository import GstRtspServer, GstRtsp
 from python_module.component.system_config import get_config
- 
+from python_module.common.platform_info import PlatformInfo
 
 def create_rtsp_server():
+    platform_info = PlatformInfo()
     config_values = get_config()
     rtsp_port_num = config_values['RTSP_PORT']
     rtsp_stream_end = config_values['RTSP_FACTORY']
     updsink_port_num = config_values['RTSP_UDPSYNC']
-    codec = 'H265'
+    if platform_info.is_jetson_nano_device():
+        codec = 'H264'
+    else:
+        codec = 'H265'
 
     server = GstRtspServer.RTSPServer.new()
     auth = GstRtspServer.RTSPAuth()
@@ -31,7 +35,8 @@ def create_rtsp_server():
     server.attach(None)
 
     factory = GstRtspServer.RTSPMediaFactory.new()
-    factory.set_protocols(GstRtsp.RTSPLowerTrans.UDP)
+    factory.set_protocols(GstRtsp.RTSPLowerTrans.UDP |
+                      GstRtsp.RTSPLowerTrans.TCP )
     factory.set_transport_mode(GstRtspServer.RTSPTransportMode.PLAY)
     factory.set_latency(1)
     factory.set_launch(

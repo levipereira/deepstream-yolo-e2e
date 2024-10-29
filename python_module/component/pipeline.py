@@ -33,7 +33,6 @@ from python_module.common.platform_info import PlatformInfo
 # Function to create the pipeline
 def create_pipeline(args, model_type):
     platform_info = PlatformInfo()
-    is_integrated_or_aarch64 = platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64()
     Gst.init(None)
     stream_output=args.output.upper()
     config_values = get_config()
@@ -71,16 +70,23 @@ def create_pipeline(args, model_type):
         if stream_output in ("FILE","RTSP"):
             elements["nvvidconv_encoder"] = ("nvvideoconvert", "nvvidconv_encoder")
             elements["filter_encoder"] = ("capsfilter", "filter_encoder")
-            elements["encoder"] = ("nvv4l2h265enc", "encoder")
-            elements["codeparser"] = ("h265parse", "h265-parser2")
+            if platform_info.is_jetson_nano_device():   ## nano does not have hardware encoder
+                elements["encoder"] = ("x264enc", "encoder")
+                elements["codeparser"] = ("h264parse", "h264-parser")
+            else:
+                elements["encoder"] = ("nvv4l2h265enc", "encoder")
+                elements["codeparser"] = ("h265parse", "h265-parser")
             if stream_output  == "FILE":
                 elements["container"] = ("matroskamux", "muxer")
                 elements["sink"] = ("filesink", "file-sink")
             if stream_output  == "RTSP":
-                elements["rtppay"] = ("rtph265pay", "rtppay")
+                if platform_info.is_jetson_nano_device():
+                    elements["rtppay"] = ("rtph264pay", "rtppay")
+                else:
+                    elements["rtppay"] = ("rtph265pay", "rtppay")
                 elements["sink"] = ("udpsink", "udpsink")
         else:
-            if is_integrated_or_aarch64:
+            if platform_info.is_jetson_device():
                 elements["sink"] = ("nv3dsink", "nvvideo-renderer") 
             else:
                 elements["sink"] = ("nveglglessink", "nvvideo-renderer")    
@@ -117,6 +123,9 @@ def create_pipeline(args, model_type):
     elements["tracker"].set_property('ll-lib-file', '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
     elements["tracker"].set_property('ll-config-file', '/apps/deepstream-yolo-e2e/config/tracker/config_tracker_NvDCF_perf.yml')
     elements["tracker"].set_property('display-tracking-id', 0)
+    if platform_info.is_jetson_device():
+        elements["tracker"].set_property('compute-hw', 2)
+        
 
     if stream_output == "SILENT":
         elements["sink"].set_property('enable-last-sample', 0)
@@ -141,14 +150,28 @@ def create_pipeline(args, model_type):
 
 
         if stream_output in ("FILE", "RTSP"):
-            elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
-            elements["encoder"].set_property('control-rate', 2) 
+            if platform_info.is_jetson_device():
+                elements["nvvidconv_tiler"].set_property('copy-hw', 2) 
+                elements["nvvidconv_tiler"].set_property('compute-hw', 2) 
+                elements["nvvidconv_encoder"].set_property('copy-hw', 2)
+                elements["nvvidconv_encoder"].set_property('compute-hw', 2)
+            
+            if platform_info.is_jetson_nano_device():
+                elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw, format=I420"))
+            else:
+                elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
+            
 
-            if is_integrated_or_aarch64:
+            if platform_info.is_jetson_device() and not platform_info.is_jetson_nano_device() : 
                 elements["encoder"].set_property('maxperf-enable', True) 
                 elements["encoder"].set_property('preset-level', 1)
-            else:
+            elif platform_info.is_jetson_nano_device():
+                elements["encoder"].set_property('bitrate', 2000000) 
+                elements["encoder"].set_property('speed-preset', 'ultrafast') 
+                elements["encoder"].set_property('tune', 'zerolatency') 
+            elif not platform_info.is_platform_aarch64():
                 elements["encoder"].set_property('tuning-info-id', 2) 
+                elements["encoder"].set_property('control-rate', 2) 
             
             if stream_output == "FILE":
                 output_directory = config_values['OUTPUT_DIRECTORY']   
