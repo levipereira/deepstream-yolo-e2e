@@ -143,6 +143,7 @@ git submodule update --init --recursive
 In this example, we will use **DeepStream 7.1**.
 
 Start the docker container from `deepstream-yolo-e2e` dir:
+>Note: If you are not using the computer's display output, especially on Jetson devices, remove the `-e DISPLAY=$DISPLAY` and  `-v /tmp/.X11-unix/:/tmp/.X11-unix` options, as they may cause errors.
 #### 2.1 Windows WSL
 ```bash
 docker run \
