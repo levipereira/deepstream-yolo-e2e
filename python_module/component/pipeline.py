@@ -33,6 +33,7 @@ from python_module.common.platform_info import PlatformInfo
 # Function to create the pipeline
 def create_pipeline(args, model_type):
     platform_info = PlatformInfo()
+    is_integrated_or_aarch64 = platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64()
     Gst.init(None)
     stream_output=args.output.upper()
     config_values = get_config()
@@ -79,7 +80,7 @@ def create_pipeline(args, model_type):
                 elements["rtppay"] = ("rtph265pay", "rtppay")
                 elements["sink"] = ("udpsink", "udpsink")
         else:
-            if platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64():
+            if is_integrated_or_aarch64:
                 elements["sink"] = ("nv3dsink", "nvvideo-renderer") 
             else:
                 elements["sink"] = ("nveglglessink", "nvvideo-renderer")    
@@ -142,10 +143,13 @@ def create_pipeline(args, model_type):
         if stream_output in ("FILE", "RTSP"):
             elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
             elements["encoder"].set_property('control-rate', 2) 
-            elements["encoder"].set_property('tuning-info-id', 2)  
+
+            if is_integrated_or_aarch64:
+                elements["encoder"].set_property('maxperf-enable', True) 
+                elements["encoder"].set_property('preset-level', 1)
+            else:
+                elements["encoder"].set_property('tuning-info-id', 2) 
             
-            
-              
             if stream_output == "FILE":
                 output_directory = config_values['OUTPUT_DIRECTORY']   
                 output_prefix =  config_values['OUTPUT_PREFIX']  
