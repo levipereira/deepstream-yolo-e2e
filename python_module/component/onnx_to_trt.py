@@ -7,6 +7,7 @@ import time
 import curses
 from prettytable import PrettyTable
 import subprocess
+from python_module.common.platform_info import PlatformInfo
 
 MODEL_ENGINE_DIR = '/apps/deepstream-yolo-e2e/models/engine/'
 
@@ -53,12 +54,11 @@ def get_gpu_name():
         return "Unknown GPU"
 
 def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_size, precision):
+    platform_info = PlatformInfo()
     """Display a spinner, GPU usage, and model details in the terminal. Stops when stop_event is set."""
+    is_integrated_or_aarch64 = platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64()
     
-    # Get GPU name
-    if not os.path.isfile('/proc/device-tree/model'):
-        gpu_name = get_gpu_name()
-    
+  
     # Modify model_name to remove everything after the second dash from the end
     modified_model_name = '-'.join(model_name.split('-')[:-2]) if model_name.count('-') > 1 else model_name
     
@@ -74,8 +74,8 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
     index = 0
 
     # Fixed layout that doesn't need to be redrawn each time
-    if not os.path.isfile('/proc/device-tree/model'):
-        stdscr.addstr(1, 0, f"GPU: {gpu_name}")
+    if not is_integrated_or_aarch64:
+        stdscr.addstr(1, 0, f"GPU: {get_gpu_name()}")
     stdscr.addstr(3, 0, "Model Information:")
     stdscr.addstr(4, 0, table.get_string())
 
@@ -87,7 +87,7 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
     while not stop_event.is_set():  # Check if stop_event is set to terminate the loop
         # Get the GPU usage percentage
         gpu_usage = 0
-        if not os.path.isfile('/proc/device-tree/model'):
+        if not is_integrated_or_aarch64:
             gpu_usage = get_gpu_usage()
 
         # Create a progress bar for GPU usage
@@ -97,7 +97,7 @@ def spinner_and_gpu_monitor(stdscr, stop_event, model_name, network_size, batch_
         
         # Only update dynamic parts (spinner and GPU usage)
         stdscr.addstr(15, 0, f"Precision Calibration and Layer Fusion in Progress... {spin_chars[index]}")
-        if not os.path.isfile('/proc/device-tree/model'):
+        if not is_integrated_or_aarch64:
             stdscr.addstr(16, 0, f"GPU Usage: [{bar}] {gpu_usage}%")
         
         # Refresh the screen to update the display

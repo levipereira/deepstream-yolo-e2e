@@ -27,12 +27,12 @@ from python_module.component.pre_process import pre_process
 from python_module.common.bus_call import bus_call
 from python_module.common.utils import create_dynamic_labels
 from python_module.component.system_config import get_config
-
-
+from python_module.common.platform_info import PlatformInfo
 
 
 # Function to create the pipeline
 def create_pipeline(args, model_type):
+    platform_info = PlatformInfo()
     Gst.init(None)
     stream_output=args.output.upper()
     config_values = get_config()
@@ -79,7 +79,10 @@ def create_pipeline(args, model_type):
                 elements["rtppay"] = ("rtph265pay", "rtppay")
                 elements["sink"] = ("udpsink", "udpsink")
         else:
-            elements["sink"] = ("nveglglessink", "nvvideo-renderer")    
+            if platform_info.is_integrated_gpu() or platform_info.is_platform_aarch64():
+                elements["sink"] = ("nv3dsink", "nvvideo-renderer") 
+            else:
+                elements["sink"] = ("nveglglessink", "nvvideo-renderer")    
 
     
     ## Create Elements

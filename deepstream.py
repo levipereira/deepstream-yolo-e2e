@@ -19,7 +19,6 @@ from python_module.common.utils import clear_screen
 import os
 
 os.environ['GST_DEBUG'] = 'ERROR'  
-
 os.system('stty sane')
 
 def display_output_options():

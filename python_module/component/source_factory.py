@@ -16,6 +16,7 @@ import os
 import configparser
 import subprocess
 from python_module.component.yt_factory import get_yt_uri
+from python_module.common.platform_info import PlatformInfo
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
@@ -50,12 +51,16 @@ def decodebin_child_added(child_proxy, Object, name, user_data):
     if name.find("decodebin") != -1:
         Object.connect("child-added", decodebin_child_added, user_data)
 
+    if (name.find("nvv4l2decoder") != -1):
+        if (platform_info.is_integrated_gpu()):
+            Object.set_property("enable-max-performance", True)
+            Object.set_property("drop-frame-interval", 0)
+            Object.set_property("num-extra-surfaces", 0)
+
     if "source" in name:
         source_element = child_proxy.get_by_name("source")
         if source_element.find_property('drop-on-latency') != None:
             Object.set_property("drop-on-latency", True)
-#    if "souphttpsrc" in name:
-#        Object.set_property("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
 
  
 def create_source_bin(index,uri):
