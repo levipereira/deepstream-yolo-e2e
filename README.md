@@ -146,6 +146,7 @@ Start the docker container from `deepstream-yolo-e2e` dir:
 >Note: If you are not using the computer's display output, especially on Jetson devices, remove the `-e DISPLAY=$DISPLAY` and  `-v /tmp/.X11-unix/:/tmp/.X11-unix` options, as they may cause errors.
 #### 2.1 Windows WSL
 ```bash
+xhost +
 docker run \
         -it \
         --privileged \
@@ -164,6 +165,7 @@ docker run \
 
 #### 2.2 Linux
 ```bash
+xhost +
 docker run \
         -it \
         --privileged \
@@ -180,6 +182,7 @@ docker run \
 
 #### 2.3 Jetson
 ```bash
+xhost +
 docker run \
         -it \
         --privileged \
