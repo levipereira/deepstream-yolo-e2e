@@ -50,12 +50,15 @@ download_and_patch() {
     echo "$lib_name has been installed successfully."
 }
 
-# Function to check and apply the appropriate patch
+# Function to check and apply the appropriate patch based on architecture
 check_and_patch() {
     for lib in "${!URLs[@]}"; do
-        if [ -f "$TRT_INSTALL_LIBPATH/${lib%.*}" ]; then
-            download_and_patch "$lib" "${URLs[$lib]}"
-            return 0
+        if [[ $lib == *"$arch" ]]; then
+            lib_base="${lib%.*}"
+            if [ -f "$TRT_INSTALL_LIBPATH/$lib_base" ]; then
+                download_and_patch "$lib" "${URLs[$lib]}"
+                return 0
+            fi
         fi
     done
     echo "No compatible version of libnvinfer_plugin.so found in $TRT_INSTALL_LIBPATH."
