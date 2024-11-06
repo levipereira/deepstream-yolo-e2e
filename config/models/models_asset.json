@@ -1130,6 +1130,19 @@
         "state": "uploaded",
         "updatedAt": "2024-10-21T02:55:52Z",
         "url": "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9t-trt.txt"
+      },
+      {
+        "apiUrl": "https://api.github.com/repos/levipereira/yolo_e2e/releases/assets/200548901",
+        "contentType": "text/plain",
+        "createdAt": "2024-10-21T02:55:52Z",
+        "downloadCount": 0,
+        "id": "RA_kwDOMKJMz84L9CIl",
+        "label": "",
+        "name": "yolov9c-seg-qat-trt.onnx",
+        "size": 621,
+        "state": "uploaded",
+        "updatedAt": "2024-10-21T02:55:52Z",
+        "url": "https://github.com/levipereira/yolo_e2e/releases/download/v1.0/yolov9c-seg-qat-trt.onnx"
       }
     ]
   }

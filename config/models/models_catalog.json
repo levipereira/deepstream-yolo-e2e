@@ -142,6 +142,10 @@
         {
           "model_arch": "YOLOv9",
           "model_name": "yolov9c-seg-trt"
+        },
+        {
+          "model_arch": "YOLOv9 QAT (GELAN)",
+          "model_name": "yolov9c-seg-qat-trt"
         }
       ],
       "Large": [
