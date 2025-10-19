@@ -88,9 +88,12 @@ def create_pipeline(args, model_type):
             if stream_output  == "RTSP":
                 if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
                     elements["rtppay"] = ("rtph264pay", "rtppay")
+                    print(f"✓ RTSP: Using H.264 encoding (CPU)")
                 else:
                     elements["rtppay"] = ("rtph265pay", "rtppay")
+                    print(f"✓ RTSP: Using H.265 encoding (GPU)")
                 elements["sink"] = ("udpsink", "udpsink")
+                print(f"✓ RTSP: Using UDP sink")
         else:
             if platform_info.is_jetson_device():
                 elements["sink"] = ("nv3dsink", "nvvideo-renderer") 
@@ -99,12 +102,16 @@ def create_pipeline(args, model_type):
 
     
     ## Create Elements
+    print(f"\n=== Creating Pipeline Elements ===")
     for name, val in elements.items():
         element = Gst.ElementFactory.make(val[0], val[1])
         if not element:
             sys.stderr.write(f"Unable to create {name}\n")
             return None
         elements[name] = element
+        print(f"✓ Created {name}: {val[0]} ({val[1]})")
+    
+    print(f"=== Total elements created: {len(elements)} ===\n")
 
     ## Configure Elements
     if os.environ.get('USE_NEW_NVSTREAMMUX') != 'yes':
@@ -201,10 +208,17 @@ def create_pipeline(args, model_type):
                 elements["sink"].set_property('sync', 0)
             
             if stream_output == "RTSP":
-                elements["sink"].set_property('host', "127.0.0.1")
-                elements["sink"].set_property('port', config_values['RTSP_UDPSYNC'])
+                rtsp_host = "localhost"
+                rtsp_port = config_values['RTSP_UDPSYNC']
+                elements["sink"].set_property('host', rtsp_host)
+                elements["sink"].set_property('port', rtsp_port)
                 elements["sink"].set_property('async', False)
                 elements["sink"].set_property('sync', 1)
+                print(f"✓ RTSP Configuration:")
+                print(f"  - Host: {rtsp_host}")
+                print(f"  - Port: {rtsp_port}")
+                print(f"  - Async: False")
+                print(f"  - Sync: True")
             
 
     ## Add Elements to Pipeline
@@ -214,49 +228,101 @@ def create_pipeline(args, model_type):
 
 
     ## Create Sources 
+    print(f"\n=== Creating Media Sources ===")
+    print(f"Number of sources: {number_sources}")
+    
     for index, (media, url, uri) in enumerate(media_sources):
-        print(f"Source: {url}. Creating source_bin {index} \n ")
+        print(f"✓ Source {index}: {url}")
+        print(f"  - Media: {media}")
+        print(f"  - URI: {uri}")
+        print(f"  - Creating source_bin {index}")
+        
         source_bin = create_source_bin(index, uri)
         if not source_bin:
             sys.stderr.write("Unable to create source bin \n")
+            return None
+        
         pipeline.add(source_bin)
         padname = "sink_%u" % index
         sinkpad = elements["streammux"].request_pad_simple(padname)
         if not sinkpad:
             sys.stderr.write("Unable to create sink pad bin \n")
+            return None
         srcpad = source_bin.get_static_pad("src")
         if not srcpad:
             sys.stderr.write("Unable to create src pad bin \n")
+            return None
         srcpad.link(sinkpad)
+        print(f"  - Linked source {index} to streammux")
+    
+    print(f"=== All sources created and linked ===\n")
 
 
+    print(f"\n=== Linking Pipeline Elements ===")
+    
+    # Core pipeline links
+    print(f"✓ Linking: streammux -> pgie")
     elements["streammux"].link(elements["pgie"])
+    print(f"✓ Linking: pgie -> tracker")
     elements["pgie"].link(elements["tracker"])
 
     if stream_output == "SILENT":
         element_probe = elements["tracker"]
+        print(f"✓ Linking: tracker -> sink (SILENT)")
         elements["tracker"].link(elements["sink"])
 
     if stream_output in ("FILE", "RTSP", "DISPLAY"):
         element_probe = elements["nvtiler"]
+        print(f"✓ Linking: tracker -> nvvidconv_tiler")
         elements["tracker"].link(elements["nvvidconv_tiler"])
+        print(f"✓ Linking: nvvidconv_tiler -> filter_tiler")
         elements["nvvidconv_tiler"].link(elements["filter_tiler"])
+        print(f"✓ Linking: filter_tiler -> nvtiler")
         elements["filter_tiler"].link(elements["nvtiler"])
+        print(f"✓ Linking: nvtiler -> nvosd")
         elements["nvtiler"].link(elements["nvosd"])
+        
         if stream_output in ("FILE", "RTSP"):
+            print(f"✓ Linking: nvosd -> nvvidconv_encoder")
             elements["nvosd"].link(elements["nvvidconv_encoder"])
+            print(f"✓ Linking: nvvidconv_encoder -> filter_encoder")
             elements["nvvidconv_encoder"].link(elements["filter_encoder"])
+            print(f"✓ Linking: filter_encoder -> encoder")
             elements["filter_encoder"].link(elements["encoder"])
+            
             if stream_output == "FILE":
+                print(f"✓ Linking: encoder -> codeparser")
                 elements["encoder"].link(elements["codeparser"])
+                print(f"✓ Linking: codeparser -> container")
                 elements["codeparser"].link(elements["container"])
+                print(f"✓ Linking: container -> sink (FILE)")
                 elements["container"].link(elements["sink"])
+                
             if stream_output == "RTSP":
+                print(f"✓ Linking: encoder -> rtppay")
                 elements["encoder"].link(elements["rtppay"])
+                print(f"✓ Linking: rtppay -> sink (RTSP)")
                 elements["rtppay"].link(elements["sink"])
+                print(f"✓ RTSP Pipeline: Complete")
         
         else:
+            print(f"✓ Linking: nvosd -> sink (DISPLAY)")
             elements["nvosd"].link(elements["sink"])
+    
+    print(f"=== Pipeline linking completed ===\n")
+    
+    # Print pipeline summary
+    print(f"=== Pipeline Summary ===")
+    print(f"Output type: {stream_output}")
+    print(f"Encoding: {getattr(args, 'encoding', 'cpu')}")
+    print(f"Number of sources: {number_sources}")
+    print(f"Model type: {model_type}")
+    if stream_output == "RTSP":
+        print(f"RTSP Stream: rtsp://localhost:{config_values['RTSP_PORT']}{config_values['RTSP_FACTORY']}")
+        #print(f"Internal UDP: udp://127.0.0.1:{config_values['RTSP_UDPSYNC']}")
+    elif stream_output == "FILE":
+        print(f"Output file: {output_file_path}")
+    print(f"========================\n")
     
     dynamic_labels = create_dynamic_labels(pgie_conf_file)
 

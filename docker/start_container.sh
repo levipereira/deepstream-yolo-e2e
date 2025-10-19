@@ -59,27 +59,30 @@ select_deepstream_version() {
     if [ "$1" = "7.1" ] || [ "$1" = "8.0" ]; then
         DEEPSTREAM_VERSION="$1"
         print_success "Version selected via parameter: DeepStream $DEEPSTREAM_VERSION"
-        return
+    else
+        # Ask user if not specified
+        echo ""
+        echo "Choose DeepStream version:"
+        echo "1) DeepStream 8.0 (default)"
+        echo "2) DeepStream 7.1"
+        echo ""
+        read -p "Enter your choice [1]: " choice
+        
+        case $choice in
+            2)
+                DEEPSTREAM_VERSION="7.1"
+                ;;
+            *)
+                DEEPSTREAM_VERSION="8.0"
+                ;;
+        esac
+        
+        print_success "Version selected: DeepStream $DEEPSTREAM_VERSION"
     fi
     
-    # Ask user if not specified
-    echo ""
-    echo "Choose DeepStream version:"
-    echo "1) DeepStream 8.0 (default)"
-    echo "2) DeepStream 7.1"
-    echo ""
-    read -p "Enter your choice [1]: " choice
-    
-    case $choice in
-        2)
-            DEEPSTREAM_VERSION="7.1"
-            ;;
-        *)
-            DEEPSTREAM_VERSION="8.0"
-            ;;
-    esac
-    
-    print_success "Version selected: DeepStream $DEEPSTREAM_VERSION"
+    # Set container name based on version
+    CONTAINER_NAME="deepstream-yolo-e2e-$DEEPSTREAM_VERSION"
+    print_info "Container name: $CONTAINER_NAME"
 }
 
 # Function to configure platform-specific parameters
@@ -108,7 +111,7 @@ configure_platform_params() {
 
 # Function to check if container exists
 check_container_exists() {
-    if docker ps -a --format "table {{.Names}}" | grep -q "^deepstream-yolo-e2e$"; then
+    if docker ps -a --format "table {{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
         return 0  # Container exists
     else
         return 1  # Container doesn't exist
@@ -117,7 +120,7 @@ check_container_exists() {
 
 # Function to check if container is running
 is_container_running() {
-    if docker ps --format "table {{.Names}}" | grep -q "^deepstream-yolo-e2e$"; then
+    if docker ps --format "table {{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
         return 0  # Container is running
     else
         return 1  # Container is not running
@@ -127,7 +130,7 @@ is_container_running() {
 # Function to handle existing container
 handle_existing_container() {
     if is_container_running; then
-        print_warning "Container 'deepstream-yolo-e2e' is already running!"
+        print_warning "Container '$CONTAINER_NAME' is already running!"
         echo ""
         echo "What would you like to do?"
         echo "1) Connect to the running container"
@@ -139,8 +142,8 @@ handle_existing_container() {
         case $choice in
             2)
                 print_info "Stopping and removing existing container..."
-                docker stop deepstream-yolo-e2e
-                docker rm deepstream-yolo-e2e
+                docker stop $CONTAINER_NAME
+                docker rm $CONTAINER_NAME
                 return 1  # Continue with new container creation
                 ;;
             3)
@@ -149,12 +152,12 @@ handle_existing_container() {
                 ;;
             *)
                 print_info "Connecting to existing container..."
-                docker exec -it deepstream-yolo-e2e /bin/bash
+                docker exec -it $CONTAINER_NAME /bin/bash
                 exit 0
                 ;;
         esac
     else
-        print_warning "Container 'deepstream-yolo-e2e' exists but is not running!"
+        print_warning "Container '$CONTAINER_NAME' exists but is not running!"
         echo ""
         echo "What would you like to do?"
         echo "1) Start the existing container"
@@ -166,7 +169,7 @@ handle_existing_container() {
         case $choice in
             2)
                 print_info "Removing existing container..."
-                docker rm deepstream-yolo-e2e
+                docker rm $CONTAINER_NAME
                 return 1  # Continue with new container creation
                 ;;
             3)
@@ -175,8 +178,8 @@ handle_existing_container() {
                 ;;
             *)
                 print_info "Starting existing container..."
-                docker start deepstream-yolo-e2e
-                docker exec -it deepstream-yolo-e2e /bin/bash
+                docker start $CONTAINER_NAME
+                docker exec -it $CONTAINER_NAME /bin/bash
                 exit 0
                 ;;
         esac
@@ -202,7 +205,7 @@ run_container() {
     DOCKER_CMD="docker run \
         -it \
         --privileged \
-        --name deepstream-yolo-e2e \
+        --name $CONTAINER_NAME \
         --net=host \
         --ipc=host \
         $GPU_PARAMS \
@@ -211,10 +214,9 @@ run_container() {
         $EXTRA_DEVICES \
         -v /tmp/.X11-unix/:/tmp/.X11-unix \
         -v \`pwd\`:/apps/deepstream-yolo-e2e \
-        -v /run/user/0:/run/user/0 \
-        -v /mnt/wslg/runtime-dir:/mnt/wslg/runtime-dir \
         -w /apps/deepstream-yolo-e2e \
-        deepstream-yolo-e2e_8.0"
+        nvcr.io/nvidia/deepstream:$DEEPSTREAM_VERSION-triton-multiarch"
+        #deepstream-yolo-e2e_8.0"
         
         #nvcr.io/nvidia/deepstream:$DEEPSTREAM_VERSION-triton-multiarch"
     
@@ -231,13 +233,17 @@ show_help() {
     echo "Usage: $0 [version]"
     echo ""
     echo "Available versions:"
-    echo "  7.1    - DeepStream 7.1"
-    echo "  8.0    - DeepStream 8.0 (default)"
+    echo "  7.1    - DeepStream 7.1 (container: deepstream-yolo-e2e-7.1)"
+    echo "  8.0    - DeepStream 8.0 (container: deepstream-yolo-e2e-8.0)"
     echo ""
     echo "Examples:"
     echo "  $0        # Uses DeepStream 8.0 (default)"
     echo "  $0 7.1    # Uses DeepStream 7.1"
     echo "  $0 8.0    # Uses DeepStream 8.0"
+    echo ""
+    echo "Container naming:"
+    echo "  Each version uses a unique container name, allowing you to run"
+    echo "  both DeepStream 7.1 and 8.0 containers simultaneously."
     echo ""
     echo "The script automatically detects the platform:"
     echo "  - Windows WSL"
@@ -269,6 +275,7 @@ main() {
     print_info "Final configuration:"
     echo "  Platform: $PLATFORM"
     echo "  DeepStream: $DEEPSTREAM_VERSION"
+    echo "  Container: $CONTAINER_NAME"
     echo ""
     
     # Run the container
