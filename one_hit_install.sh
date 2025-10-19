@@ -24,20 +24,15 @@ if [[ $DEEPSTREAM_VERSION_DIR =~ deepstream-([0-9]+\.[0-9]+) ]]; then
     VERSION="${BASH_REMATCH[1]}"
     
     case "$VERSION" in
+        "8.0")
+            bash /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.2.2
+            ;;
         "7.1")
             bash /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.2.0
             ;;
-        "7.0")
-            bash /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.11
-            ;;
-        "6.4")
-            bash /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.10
-            ;;
-        "6.3")
-            bash /opt/nvidia/deepstream/deepstream/user_deepstream_python_apps_install.sh --version 1.1.8
-            ;;
         *)
             echo "Unsupported DeepStream version: $VERSION"
+            echo "Supported versions: 7.1, 8.0"
             exit 1
             ;;
     esac
@@ -75,16 +70,35 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-pip3 install yt-dlp prettytable requests
-if [ $? -ne 0 ]; then
-    echo "Failed to install yt-dlp, prettytable and requests."
-    exit 1
-fi
-
-# Install correct version of cuda-python to avoid import errors
-pip3 install cuda-python==12.6.0
-if [ $? -ne 0 ]; then
-    echo "Failed to install cuda-python 12.6.0."
+# Install Python packages based on DeepStream version
+if [ "$VERSION" = "8.0" ]; then
+    echo "Installing Python packages in DeepStream 8.0 virtual environment..."
+    # Activate the virtual environment and install packages
+    source /opt/nvidia/deepstream/deepstream-8.0/sources/deepstream_python_apps/pyds/bin/activate
+    pip install yt-dlp prettytable requests
+    if [ $? -ne 0 ]; then
+        echo "Failed to install yt-dlp, prettytable and requests in virtual environment."
+        exit 1
+    fi
+    echo "Skipping cuda-python installation for DeepStream $VERSION (not required)."
+    deactivate
+elif [ "$VERSION" = "7.1" ]; then
+    echo "Installing Python packages for DeepStream 7.1..."
+    pip3 install yt-dlp prettytable requests
+    if [ $? -ne 0 ]; then
+        echo "Failed to install yt-dlp, prettytable and requests."
+        exit 1
+    fi
+    
+    # Install correct version of cuda-python to avoid import errors (only for DeepStream 7.1)
+    echo "Installing cuda-python 12.6.0 for DeepStream 7.1..."
+    pip3 install cuda-python==12.6.0
+    if [ $? -ne 0 ]; then
+        echo "Failed to install cuda-python 12.6.0."
+        exit 1
+    fi
+else
+    echo "Unsupported DeepStream version: $VERSION"
     exit 1
 fi
 

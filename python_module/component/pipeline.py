@@ -70,17 +70,23 @@ def create_pipeline(args, model_type):
         if stream_output in ("FILE","RTSP"):
             elements["nvvidconv_encoder"] = ("nvvideoconvert", "nvvidconv_encoder")
             elements["filter_encoder"] = ("capsfilter", "filter_encoder")
-            if platform_info.is_jetson_nano_device():   ## nano does not have hardware encoder
+            
+            # Get encoding choice from args, default to CPU
+            encoding_choice = getattr(args, 'encoding', 'cpu')
+            
+            if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
+                # Use CPU encoding (x264enc) as default or for Jetson Nano
                 elements["encoder"] = ("x264enc", "encoder")
                 elements["codeparser"] = ("h264parse", "h264-parser")
             else:
+                # Use GPU encoding (nvv4l2h265enc) when explicitly requested
                 elements["encoder"] = ("nvv4l2h265enc", "encoder")
                 elements["codeparser"] = ("h265parse", "h265-parser")
             if stream_output  == "FILE":
                 elements["container"] = ("matroskamux", "muxer")
                 elements["sink"] = ("filesink", "file-sink")
             if stream_output  == "RTSP":
-                if platform_info.is_jetson_nano_device():
+                if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
                     elements["rtppay"] = ("rtph264pay", "rtppay")
                 else:
                     elements["rtppay"] = ("rtph265pay", "rtppay")
@@ -150,28 +156,35 @@ def create_pipeline(args, model_type):
 
 
         if stream_output in ("FILE", "RTSP"):
+            # Get encoding choice from args, default to CPU
+            encoding_choice = getattr(args, 'encoding', 'cpu')
+            
             if platform_info.is_jetson_device():
                 elements["nvvidconv_tiler"].set_property('copy-hw', 2) 
                 elements["nvvidconv_tiler"].set_property('compute-hw', 2) 
                 elements["nvvidconv_encoder"].set_property('copy-hw', 2)
                 elements["nvvidconv_encoder"].set_property('compute-hw', 2)
             
-            if platform_info.is_jetson_nano_device():
+            # Configure encoder caps based on encoding choice
+            if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
                 elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw, format=I420"))
             else:
                 elements["filter_encoder"].set_property("caps", Gst.Caps.from_string("video/x-raw(memory:NVMM), format=I420"))
             
-
-            if platform_info.is_jetson_device() and not platform_info.is_jetson_nano_device() : 
-                elements["encoder"].set_property('maxperf-enable', True) 
-                elements["encoder"].set_property('preset-level', 1)
-            elif platform_info.is_jetson_nano_device():
+            # Configure encoder properties based on encoding choice
+            if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
+                # CPU encoding configuration
                 elements["encoder"].set_property('bitrate', 2000000) 
                 elements["encoder"].set_property('speed-preset', 'ultrafast') 
-                elements["encoder"].set_property('tune', 'zerolatency') 
-            elif not platform_info.is_platform_aarch64():
-                elements["encoder"].set_property('tuning-info-id', 2) 
-                elements["encoder"].set_property('control-rate', 2) 
+                elements["encoder"].set_property('tune', 'zerolatency')
+            else:
+                # GPU encoding configuration
+                if platform_info.is_jetson_device() and not platform_info.is_jetson_nano_device():
+                    elements["encoder"].set_property('maxperf-enable', True) 
+                    elements["encoder"].set_property('preset-level', 1)
+                elif not platform_info.is_platform_aarch64():
+                    elements["encoder"].set_property('tuning-info-id', 2) 
+                    elements["encoder"].set_property('control-rate', 2) 
             
             if stream_output == "FILE":
                 output_directory = config_values['OUTPUT_DIRECTORY']   

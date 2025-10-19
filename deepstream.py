@@ -42,6 +42,25 @@ def display_output_options():
     print("Please choose the output option:")
     print(table)
 
+def display_encoding_options():
+    """Display available encoding options to the user in a table format."""
+    table = PrettyTable()
+    table.field_names = ["Index", "Encoding Option", "Description"]
+    table.align["Index"] = "l"
+    table.align["Encoding Option"] = "l"
+    table.align["Description"] = "l"
+
+    options = [
+        ("1", "cpu", "CPU encoding (default)"),
+        ("2", "gpu", "GPU encoding (hardware accelerated)"),
+    ]
+    
+    for option in options:
+        table.add_row(option)
+
+    print("Please choose the encoding option:")
+    print(table)
+
 def get_user_choice():
     """Get the user's choice for output option."""
     while True:
@@ -51,6 +70,21 @@ def get_user_choice():
                 return ["display", "file", "rtsp", "silent"][choice - 1]
             else:
                 print("Invalid choice. Please select a number between 1 and 4.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+        except KeyboardInterrupt:
+            print("\nInput interrupted. Exiting application.")
+            sys.exit(0)
+
+def get_encoding_choice():
+    """Get the user's choice for encoding option."""
+    while True:
+        try:
+            choice = int(input("Enter the number corresponding to your choice: "))
+            if choice in range(1, 3):  # Valid choices are 1-2
+                return ["cpu", "gpu"][choice - 1]
+            else:
+                print("Invalid choice. Please select a number between 1 and 2.")
         except ValueError:
             print("Invalid input. Please enter a valid number.")
         except KeyboardInterrupt:
@@ -68,18 +102,39 @@ def parse_args():
         help="Output",
         choices=["display", "file", "rtsp", "silent"],
     )
+    
+    # Adding the encoding argument as optional
+    parser.add_argument(
+        "-e",
+        "--encoding",
+        help="Encoding type (only valid for file and rtsp outputs)",
+        choices=["cpu", "gpu"],
+        default="cpu",
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     # If the user provided an output option via the command line, use it.
     if args.output:
+        # If output is file or rtsp and no encoding specified, ask for encoding choice
+        if args.output in ["file", "rtsp"] and not hasattr(args, 'encoding'):
+            display_encoding_options()
+            selected_encoding = get_encoding_choice()
+            args.encoding = selected_encoding
         return args
 
     # Otherwise, prompt the user for the output option.
     display_output_options()
     selected_output = get_user_choice()
-    return argparse.Namespace(output=selected_output)
+    
+    # If output is file or rtsp, ask for encoding choice
+    if selected_output in ["file", "rtsp"]:
+        display_encoding_options()
+        selected_encoding = get_encoding_choice()
+        return argparse.Namespace(output=selected_output, encoding=selected_encoding)
+    
+    return argparse.Namespace(output=selected_output, encoding="cpu")
 
 if __name__ == '__main__':
     clear_screen()

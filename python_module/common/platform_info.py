@@ -17,17 +17,74 @@
 
 import sys
 import platform
+import os
 from threading import Lock
-from cuda import cudart
-from cuda import cuda
 
-guard_platform_info = Lock()
+# Detect DeepStream version and configure CUDA imports accordingly
+def detect_deepstream_version():
+    """Detect the installed DeepStream version using deepstream-app --version."""
+    import subprocess
+    
+    try:
+        # Use deepstream-app --version to get the actual version
+        result = subprocess.run(['deepstream-app', '--version'], 
+                              capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            output = result.stdout.strip()
+            # Parse version from output like "deepstream-app version 8.0.0"
+            for line in output.split('\n'):
+                if 'version' in line.lower():
+                    # Extract version number (e.g., "8.0.0" from "deepstream-app version 8.0.0")
+                    parts = line.split()
+                    for part in parts:
+                        if '.' in part and part.replace('.', '').isdigit():
+                            version = part
+                            # Return major.minor version (e.g., "8.0" from "8.0.0")
+                            major_minor = '.'.join(version.split('.')[:2])
+                            return major_minor
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError, Exception):
+        # deepstream-app command failed or not found
+        pass
+    
+    # Fallback: check version directories
+    deepstream_root = "/opt/nvidia/deepstream/"
+    if os.path.exists(deepstream_root):
+        for item in os.listdir(deepstream_root):
+            if item.startswith("deepstream-"):
+                version = item.replace("deepstream-", "")
+                if version == "7.1":
+                    return "7.1"
+                elif version >= "8.0":
+                    return version
+    
+    # Fallback: try to detect by available CUDA modules
+    try:
+        from cuda.bindings import runtime, driver
+        return "8.0"
+    except ImportError:
+        try:
+            from cuda import cudart, cuda
+            return "7.1"
+        except ImportError:
+            return "8.0"  # Default to 8.0+ (new standard)
 
-import sys
-import platform
-from threading import Lock
-from cuda import cudart
-from cuda import cuda
+# Configure CUDA imports based on DeepStream version
+DEEPSTREAM_VERSION = detect_deepstream_version()
+
+try:
+    if DEEPSTREAM_VERSION == "7.1":
+        # DeepStream 7.1 uses cuda-python package (legacy)
+        from cuda import cudart
+        from cuda import cuda
+    else:
+        # DeepStream 8.0+ uses cuda.bindings (new standard)
+        from cuda.bindings import runtime as cudart
+        from cuda.bindings import driver as cuda
+except ImportError as e:
+    print(f"ERROR: Failed to import CUDA modules for DeepStream {DEEPSTREAM_VERSION}: {e}")
+    print("For DeepStream 7.1, ensure cuda-python==12.6.0 is installed")
+    print("For DeepStream 8.0+, ensure you're using the correct virtual environment")
+    sys.exit(1)
 
 guard_platform_info = Lock()
 
@@ -41,6 +98,7 @@ class PlatformInfo:
         self.is_aarch64_verified = False
         self.is_jetson_nano = False
         self.is_jetson = False
+        self.deepstream_version = DEEPSTREAM_VERSION
 
     def is_wsl(self):
         with guard_platform_info:
@@ -58,23 +116,47 @@ class PlatformInfo:
     def is_integrated_gpu(self):
         with guard_platform_info:
             if not self.is_integrated_gpu_verified:
-                cuda_init_result, = cuda.cuInit(0)
-                if cuda_init_result == cuda.CUresult.CUDA_SUCCESS:
-                    device_count_result, num_devices = cuda.cuDeviceGetCount()
-                    if device_count_result == cuda.CUresult.CUDA_SUCCESS:
-                        if num_devices >= 1:
-                            property_result, properties = cudart.cudaGetDeviceProperties(0)
-                            if property_result == cuda.CUresult.CUDA_SUCCESS:
-                                self.is_integrated_gpu_system = properties.integrated
-                                self.is_integrated_gpu_verified = True
+                try:
+                    if self.deepstream_version == "7.1":
+                        # DeepStream 7.1 uses cuda-python API (legacy)
+                        cuda_init_result, = cuda.cuInit(0)
+                        if cuda_init_result == cuda.CUresult.CUDA_SUCCESS:
+                            device_count_result, num_devices = cuda.cuDeviceGetCount()
+                            if device_count_result == cuda.CUresult.CUDA_SUCCESS:
+                                if num_devices >= 1:
+                                    property_result, properties = cudart.cudaGetDeviceProperties(0)
+                                    if property_result == cuda.CUresult.CUDA_SUCCESS:
+                                        self.is_integrated_gpu_system = properties.integrated
+                                        self.is_integrated_gpu_verified = True
+                                    else:
+                                        print("ERROR: Getting cuda device property failed: {}".format(property_result))
+                                else:
+                                    print("ERROR: No cuda devices found to check whether iGPU/dGPU")
                             else:
-                                print("ERROR: Getting cuda device property failed: {}".format(property_result))
+                                print("ERROR: Getting cuda device count failed: {}".format(device_count_result))
                         else:
-                            print("ERROR: No cuda devices found to check whether iGPU/dGPU")
+                            print("ERROR: Cuda init failed: {}".format(cuda_init_result))
                     else:
-                        print("ERROR: Getting cuda device count failed: {}".format(device_count_result))
-                else:
-                    print("ERROR: Cuda init failed: {}".format(cuda_init_result))
+                        # DeepStream 8.0+ uses cuda.bindings API (new standard)
+                        cuda_init_result = cuda.cuInit(0)
+                        if cuda_init_result == cuda.CUresult.CUDA_SUCCESS:
+                            device_count_result, num_devices = cuda.cuDeviceGetCount()
+                            if device_count_result == cuda.CUresult.CUDA_SUCCESS:
+                                if num_devices >= 1:
+                                    property_result, properties = cudart.cudaGetDeviceProperties(0)
+                                    if property_result == cuda.CUresult.CUDA_SUCCESS:
+                                        self.is_integrated_gpu_system = properties.integrated
+                                        self.is_integrated_gpu_verified = True
+                                    else:
+                                        print("ERROR: Getting cuda device property failed: {}".format(property_result))
+                                else:
+                                    print("ERROR: No cuda devices found to check whether iGPU/dGPU")
+                            else:
+                                print("ERROR: Getting cuda device count failed: {}".format(device_count_result))
+                        else:
+                            print("ERROR: Cuda init failed: {}".format(cuda_init_result))
+                except Exception as e:
+                    print(f"ERROR: Exception in is_integrated_gpu: {e}")
         return self.is_integrated_gpu_system
 
     def is_platform_aarch64(self):
@@ -108,6 +190,16 @@ class PlatformInfo:
                                    "Run Docker as privileged with the --privileged flag.")
         return self.is_jetson_nano
 
+    def get_deepstream_version(self):
+        """Get the detected DeepStream version."""
+        return self.deepstream_version
 
+    def get_deepstream_lib_path(self):
+        """Get the DeepStream library path (works for both 7.1 and 8.0+)."""
+        return '/opt/nvidia/deepstream/deepstream/lib'
+
+
+# Configure sys.path - works for both DeepStream 7.1 and 8.0+
+DEEPSTREAM_VERSION = detect_deepstream_version()
 sys.path.append('/opt/nvidia/deepstream/deepstream/lib')
 
