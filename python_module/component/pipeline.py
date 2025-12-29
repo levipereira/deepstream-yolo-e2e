@@ -77,21 +77,19 @@ def create_pipeline(args, model_type):
             if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
                 # Use CPU encoding (x264enc) as default or for Jetson Nano
                 elements["encoder"] = ("x264enc", "encoder")
-                elements["codeparser"] = ("h264parse", "h264-parser")
             else:
-                # Use GPU encoding (nvv4l2h265enc) when explicitly requested
-                elements["encoder"] = ("nvv4l2h265enc", "encoder")
-                elements["codeparser"] = ("h265parse", "h265-parser")
+                # Use GPU encoding (nvv4l2h264enc)
+                elements["encoder"] = ("nvv4l2h264enc", "encoder")
+            elements["codeparser"] = ("h264parse", "h264-parser")
             if stream_output  == "FILE":
                 elements["container"] = ("matroskamux", "muxer")
                 elements["sink"] = ("filesink", "file-sink")
             if stream_output  == "RTSP":
+                elements["rtppay"] = ("rtph264pay", "rtppay")
                 if encoding_choice == 'cpu' or platform_info.is_jetson_nano_device():
-                    elements["rtppay"] = ("rtph264pay", "rtppay")
                     print(f"✓ RTSP: Using H.264 encoding (CPU)")
                 else:
-                    elements["rtppay"] = ("rtph265pay", "rtppay")
-                    print(f"✓ RTSP: Using H.265 encoding (GPU)")
+                    print(f"✓ RTSP: Using H.264 encoding (GPU)")
                 elements["sink"] = ("udpsink", "udpsink")
                 print(f"✓ RTSP: Using UDP sink")
         else:
@@ -208,14 +206,15 @@ def create_pipeline(args, model_type):
                 elements["sink"].set_property('sync', 0)
             
             if stream_output == "RTSP":
-                rtsp_host = "localhost"
+                rtsp_host = "224.224.255.255"
                 rtsp_port = config_values['RTSP_UDPSYNC']
                 elements["sink"].set_property('host', rtsp_host)
                 elements["sink"].set_property('port', rtsp_port)
                 elements["sink"].set_property('async', False)
                 elements["sink"].set_property('sync', 1)
+                elements["sink"].set_property('qos', 0)
                 print(f"✓ RTSP Configuration:")
-                print(f"  - Host: {rtsp_host}")
+                print(f"  - Host: {rtsp_host} (multicast)")
                 print(f"  - Port: {rtsp_port}")
                 print(f"  - Async: False")
                 print(f"  - Sync: True")

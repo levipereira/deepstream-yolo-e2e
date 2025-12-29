@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Creative Commons Attribution-NonCommercial 4.0 International License
 
@@ -12,12 +12,67 @@ License: https://creativecommons.org/licenses/by-nc/4.0/legalcode
 """
 
 import sys
+import os
+import subprocess
+
+def ensure_correct_python_environment():
+    """
+    Ensures the script runs with the correct Python interpreter based on DeepStream version.
+    For DeepStream 8.0+, automatically re-executes with the virtual environment Python.
+    """
+    # Skip if already running in the correct environment
+    if os.environ.get('DEEPSTREAM_VENV_ACTIVATED') == '1':
+        return
+    
+    deepstream_root = "/opt/nvidia/deepstream"
+    deepstream_symlink = os.path.join(deepstream_root, "deepstream")
+    
+    # Try to detect DeepStream version
+    ds_version = None
+    try:
+        if os.path.islink(deepstream_symlink):
+            target = os.path.realpath(deepstream_symlink)
+            version_dir = os.path.basename(target)
+            if version_dir.startswith("deepstream-"):
+                ds_version = version_dir.replace("deepstream-", "")
+    except Exception:
+        pass
+    
+    # For DeepStream 8.0+, use the virtual environment
+    if ds_version and ds_version >= "8.0":
+        venv_python = f"{deepstream_root}/deepstream-{ds_version}/sources/deepstream_python_apps/pyds/bin/python3"
+        
+        # Check if we're already using the correct Python
+        if sys.executable == venv_python or os.path.realpath(sys.executable) == os.path.realpath(venv_python):
+            return
+        
+        # Check if venv exists
+        if os.path.isfile(venv_python):
+            # Re-execute with the correct Python
+            env = os.environ.copy()
+            env['DEEPSTREAM_VENV_ACTIVATED'] = '1'
+            
+            try:
+                result = subprocess.run(
+                    [venv_python] + sys.argv,
+                    env=env,
+                    cwd=os.path.dirname(os.path.abspath(__file__)) or '.'
+                )
+                sys.exit(result.returncode)
+            except KeyboardInterrupt:
+                sys.exit(130)
+            except Exception as e:
+                print(f"Warning: Failed to re-execute with venv Python: {e}", file=sys.stderr)
+                print("Continuing with current Python interpreter...", file=sys.stderr)
+
+# Ensure correct environment before any other imports
+ensure_correct_python_environment()
+
 import argparse
 from prettytable import PrettyTable
 from python_module.component.pipeline import run_pipeline
 from python_module.common.utils import clear_screen
 from python_module.common.platform_info import PlatformInfo
-import os
 
 os.environ['GST_DEBUG'] = 'ERROR'  
 os.system('stty sane')
